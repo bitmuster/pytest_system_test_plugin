@@ -13,4 +13,9 @@ def test_process_get_config(process):
 def test_process_terminate(process):
     assert process.terminate() == None
 
+def test_echo_hello(process):
+    process.set_config(["echo", "hello", "world"])
+    process.run()
+    assert process.get_stdout() == "hello world"
+    assert process.get_returncode() == 0
 
