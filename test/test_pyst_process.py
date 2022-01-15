@@ -50,7 +50,6 @@ def test_stderr_file():
     pystp = PystProcess( ["ls", "notthere"] )
     pystp.run()
     content = os.path.abspath (os.path.join( os.path.dirname(__file__), "../syst_plugin/stderr.out"))
-    print(content)
     with open(content) as out:
         assert out.read().strip() == exp
 

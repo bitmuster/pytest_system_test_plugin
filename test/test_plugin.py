@@ -1,7 +1,6 @@
 import pytest
 
 def test_process_run(process):
-    print("test_process")
     assert process.run() == 0
 
 def test_process_set_config(process):

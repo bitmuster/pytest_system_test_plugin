@@ -2,11 +2,14 @@ import os
 import os.path
 import subprocess
 
+debug = False
+
 class PystProcess():
 
     def __init__(self, config):
         self.config = config
-        print(f"    A new process: {self.config}")
+        if debug:
+            print(f"    A new process: {self.config}")
 
     def set_config(self, config):
         self.config = config
@@ -24,7 +27,8 @@ class PystProcess():
         return self.proc.returncode
 
     def run(self):
-        print(f"    Process: run: {self.config}")
+        if debug:
+            print(f"    Process: run: {self.config}")
         self.proc = subprocess.run(self.config,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
@@ -40,4 +44,5 @@ class PystProcess():
         return self.proc.returncode
 
     def terminate(self):
-        print(f"    Process: terminate: {self.config}")
+        if debug:
+            print(f"    Process: terminate: {self.config}")
