@@ -14,7 +14,25 @@ def test_get_set_config():
     assert pystp.get_config() == 77
 
 def test_terminate():
-    pystp = PystProcess(22)
-    assert pystp.run() == 22
+    pystp = PystProcess(["true"])
+    assert pystp.run() == 0
     assert pystp.terminate() == None
+
+def test_echo():
+    pystp = PystProcess( ["echo", "hello", "world"] )
+    pystp.run()
+    assert pystp.get_stdout() == "hello world"
+    assert pystp.get_returncode() == 0
+
+def test_true():
+    pystp = PystProcess("true")
+    pystp.run()
+    assert pystp.get_stdout() == ""
+    assert pystp.get_returncode() == 0
+
+def test_false():
+    pystp = PystProcess("false")
+    pystp.run()
+    assert pystp.get_stdout() == ""
+    assert pystp.get_returncode() == 1
 
