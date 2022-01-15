@@ -1,4 +1,5 @@
-
+import os
+import os.path
 import pytest
 from syst_plugin.pyst_process import PystProcess
 
@@ -34,5 +35,30 @@ def test_false():
     pystp = PystProcess("false")
     pystp.run()
     assert pystp.get_stdout() == ""
+    assert pystp.get_stderr() == ""
     assert pystp.get_returncode() == 1
+
+def test_stderr():
+    pystp = PystProcess( ["ls", "notthere"] )
+    pystp.run()
+    assert pystp.get_stdout() == ""
+    assert pystp.get_stderr() == "ls: cannot access 'notthere': No such file or directory"
+    assert pystp.get_returncode() == 2
+
+def test_stderr_file():
+    exp = "ls: cannot access 'notthere': No such file or directory"
+    pystp = PystProcess( ["ls", "notthere"] )
+    pystp.run()
+    content = os.path.abspath (os.path.join( os.path.dirname(__file__), "../syst_plugin/stderr.out"))
+    print(content)
+    with open(content) as out:
+        assert out.read().strip() == exp
+
+def test_stdout_file():
+    exp = "hello world"
+    pystp = PystProcess( ["echo", "hello", "world"] )
+    pystp.run()
+    content = os.path.abspath (os.path.join( os.path.dirname(__file__), "../syst_plugin/stdout.out"))
+    with open(content) as out:
+        assert out.read().strip() == exp
 
