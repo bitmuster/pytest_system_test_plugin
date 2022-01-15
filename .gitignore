@@ -1,3 +1,5 @@
 env-plugin
 **/*.pyc
 
+syst_plugin/stdout.out
+syst_plugin/stderr.out
