@@ -59,5 +59,7 @@ So far, this will only un on unix-like systems.
 * https://github.com/pysys-test/pysys-test
 * https://github.com/CS-SI/pytest-executable
 
+* https://gitlab.com/bitmuster/pytest_system_test_plugin
+* https://github.com/bitmuster/pytest_system_test_plugin
 
 
