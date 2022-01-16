@@ -1,6 +1,3 @@
-import logging
-import os
-import os.path
 import time
 import pytest
 
@@ -47,7 +44,7 @@ def test_run_background_echo_hello_fail(process):
 def test_run_background_status_poll_fails(process):
     process.set_command(["/usr/bin/sleep", "3"])
     process.run_bg()
-    assert process.get_status() is "Running"
+    assert process.get_status() == "Running"
 
 
 def test_run_background_status_poll(process):
@@ -107,8 +104,8 @@ def test_proc_factory_was_never_started(process_factory):
     proc1 = process_factory(args)
     with pytest.raises(SystemError):
         proc1.run_bg()
-    assert proc1.get_status(5) == None
-    assert proc1.get_returncode() == None
+    assert proc1.get_status(5) is None
+    assert proc1.get_returncode() is None
 
 
 def test_grep_stdout_fg(process):

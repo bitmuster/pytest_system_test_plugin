@@ -3,6 +3,8 @@ import os
 import time
 import pytest
 
+CURL = "/usr/bin/curl -X POST http://localhost:{} -d hello_my_plugins"
+
 
 @pytest.fixture
 def echoserver(process_factory):
@@ -98,7 +100,7 @@ def test_use_case_echo_and_curl(process_factory, process):
     # give the server 100ms to start in the background
     time.sleep(0.1)
     process.set_command(
-        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split()
+        CURL.format(8080).split(),
     )
     assert process.run() == 0
 
@@ -123,14 +125,16 @@ def test_use_case_echo_and_curl_from_factory(process_factory):
     # give the server 100ms to start in the background
     time.sleep(0.1)
     client = process_factory(
-        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split(),
+        CURL.format(8080).split(),
         "client_",
     )
     client.run_bg()
     assert client.get_status() == 0
     server.kill()
     assert server.get_status() == "NotExisting"
-    assert server.get_stdout() == ""  # For weird reasons the echoserver logs to stderr
+
+    # For weird reasons the echoserver logs to stderr
+    assert server.get_stdout() == ""
     assert "hello_my_plugins" in server.get_stderr()
 
 
@@ -140,7 +144,7 @@ def test_use_case_echoserver_fixture_and_curl(process_factory, echoserver):
     # give the server 100ms to start in the background
     time.sleep(0.1)
     client = process_factory(
-        "/usr/bin/curl -X POST http://localhost:8090 -d hello_my_plugins".split(),
+        CURL.format(8090).split(),
         "client_",
     )
     client.run_bg()
@@ -166,12 +170,12 @@ def test_use_case_echoserver_1_and_2(process_factory, echoserver, echoserver_2):
     time.sleep(0.1)
 
     client_a = process_factory(
-        "/usr/bin/curl -X POST http://localhost:8090 -d hello_my_plugins".split(),
+        CURL.format(8090).split(),
         "client_a_",
     )
 
     client_b = process_factory(
-        "/usr/bin/curl -X POST http://localhost:8092 -d hello_my_plugins".split(),
+        CURL.format(8092).split(),
         "client_b_",
     )
 

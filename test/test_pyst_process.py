@@ -1,6 +1,3 @@
-import os
-import os.path
-import time
 import pytest
 from syst_plugin.pyst_process import PystProcess
 
@@ -62,12 +59,11 @@ def test_false():
 
 
 def test_stderr():
+    exp = "ls: cannot access 'notthere': No such file or directory"
     pystp = PystProcess(["ls", "notthere"])
     pystp.run()
     assert pystp.get_stdout() == ""
-    assert (
-        pystp.get_stderr() == "ls: cannot access 'notthere': No such file or directory"
-    )
+    assert pystp.get_stderr() == exp
     assert pystp.get_returncode() == 2
 
 
@@ -75,12 +71,6 @@ def test_stderr_file():
     exp = "ls: cannot access 'notthere': No such file or directory"
     pystp = PystProcess(["ls", "notthere"])
     pystp.run()
-    # content = os.path.abspath(
-    #    os.path.join(os.path.dirname(__file__), "../syst_plugin/out/stderr.out")
-    # )
-    # print(content)
-    # with open(content, encoding="utf-8") as out:
-    #    assert out.read().strip() == exp
     assert pystp.get_stderr() == exp
 
 
@@ -88,9 +78,4 @@ def test_stdout_file():
     exp = "hello nice ball"
     pystp = PystProcess(["echo", "hello", "nice", "ball"])
     pystp.run()
-    # content = os.path.abspath(
-    #    os.path.join(os.path.dirname(__file__), "../syst_plugin/out/stdout.out")
-    # )
-    # with open(content, encoding="utf-8") as out:
-    #    assert out.read().strip() == exp
     assert pystp.get_stdout() == exp
