@@ -1,3 +1,7 @@
+import os
+import os.path
+import time
+
 import pytest
 
 
@@ -14,8 +18,10 @@ def test_process_get_config(process):
     assert process.get_config() == "true"
 
 
-def test_process_terminate(process):
-    assert process.terminate() is None
+def test_process_kill(process):
+    process.set_config("read")
+    process.run_bg()
+    assert process.kill() is None
 
 
 def test_echo_hello(process):
@@ -47,3 +53,22 @@ def test_run_background_status_poll(process):
     process.set_config(["/usr/bin/sleep", "3"])
     process.run_bg()
     assert process.get_status(poll=4) == 0
+
+
+def test_use_case_echo(process):
+    interpreter = os.path.abspath("./env-plugin/bin/python")
+    process.set_config(
+        [
+            interpreter,
+            "-m",
+            "restapi_echo_server",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080",
+        ]
+    )
+    process.run_bg()
+    # assert process.get_status(poll=4) == 0
+    time.sleep(1)
+    process.kill()

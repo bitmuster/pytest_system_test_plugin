@@ -4,8 +4,9 @@
 import logging
 import os
 import os.path
-import time
+import signal
 import subprocess
+import time
 
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -84,5 +85,6 @@ class PystProcess:
 
         return None
 
-    def terminate(self):
+    def kill(self):
         logging.debug("    Process: terminate: %s", self.config)
+        os.kill(self.child, signal.SIGKILL)

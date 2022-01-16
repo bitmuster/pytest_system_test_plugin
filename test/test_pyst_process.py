@@ -17,9 +17,9 @@ def test_get_set_config():
 
 
 def test_terminate():
-    pystp = PystProcess(["true"])
-    assert pystp.run() == 0
-    assert pystp.terminate() is None
+    pystp = PystProcess(["read"])
+    pystp.run_bg()
+    assert pystp.kill() is None
 
 
 def test_echo():

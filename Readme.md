@@ -32,13 +32,16 @@ Features should be (intended, unfinished):
     source env-plugin/bin/activate
     pip install pytest
 
+    # To run tests
+    pip install restapi_echo_server
+
 
 ## Usage
 
 
 ## Test
 
-    pip install .; python -m pytest -s
+    pip install .; python -m pytest -s --log-cli-level=INFO
     tox
     tox -e {lint, linttest}
 
