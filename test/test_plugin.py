@@ -47,7 +47,7 @@ def test_run_background_echo_hello_fail(process):
 def test_run_background_status_poll_fails(process):
     process.set_config(["/usr/bin/sleep", "3"])
     process.run_bg()
-    assert process.get_status() is None
+    assert process.get_status() is "Running"
 
 
 def test_run_background_status_poll(process):
@@ -161,6 +161,7 @@ def test_use_case_echo_and_curl_from_factory(process_factory, process):
         ]
     )
     server.run_bg()
+    assert server.get_status() == "Running" # make sure it still runs
     # give the server 100ms to start in the background
     time.sleep(0.1)
     client = process_factory(

@@ -134,11 +134,12 @@ class PystProcess:
     def get_status(self, poll=1):
         """Returns the returncode of the process and polls if it hasn't yet
         finished.
-        Will return None if the process is still running.
+        Will "Running" if the process is still running.
         """
         if self.child is None:
             return None
 
+        status = None
         for _ in range(poll * 10):
             try:
                 pid, status = os.waitpid(self.child, os.WNOHANG)
@@ -148,7 +149,9 @@ class PystProcess:
                 return None
             # print(pid,status)
             if (pid, status) == (0, 0):
-                logging.debug("No status available for child %s", self.child)
+                logging.debug("No status available for child %s probably still running",
+                        self.child)
+                status = "Running"
             else:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)
@@ -157,7 +160,7 @@ class PystProcess:
                     return exitstatus
             time.sleep(0.1)
 
-        return None
+        return status
 
     def kill(self):
         logging.debug("    Process: terminate: %s", self.config)
