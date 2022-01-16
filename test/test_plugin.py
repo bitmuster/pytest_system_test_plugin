@@ -185,7 +185,7 @@ def test_use_case_echo_and_curl(process_factory, process):
     assert process.run() == 0
 
 
-def test_use_case_echo_and_curl_from_factory(process_factory, process):
+def test_use_case_echo_and_curl_from_factory(process_factory):
     # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
     server = process_factory(
@@ -197,16 +197,38 @@ def test_use_case_echo_and_curl_from_factory(process_factory, process):
             "0.0.0.0",
             "--port",
             "8080",
-        ]
+        ], "server_"
     )
     server.run_bg()
     assert server.get_status() == "Running"  # make sure it still runs
     # give the server 100ms to start in the background
     time.sleep(0.1)
     client = process_factory(
-        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split()
+        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split(),
+        "client_"
     )
     client.run_bg()
+    assert client.get_status() == 0
+    server.kill()
+    assert server.get_status() == "NotExisting"
+    assert server.get_stdout() == "" # For weird reasons the echoserver logs to stderr
+    assert "hello_my_plugins" in server.get_stderr()
+
+def test_use_case_echoserver_fixture_and_curl(process_factory, echoserver):
+    echoserver.run_bg()
+    assert echoserver.get_status() == "Running"  # make sure it still runs
+    # give the server 100ms to start in the background
+    time.sleep(0.1)
+    client = process_factory(
+        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split(),
+        "client_"
+    )
+    client.run_bg()
+    assert client.get_status() == 0
+    echoserver.kill()
+    assert echoserver.get_status() == "NotExisting"
+    assert echoserver.get_stdout() == "" # For weird reasons the echoserver logs to stderr
+    assert "hello_my_plugins" in echoserver.get_stderr()
 
 
 def test_grep_stdout_fg(process):
