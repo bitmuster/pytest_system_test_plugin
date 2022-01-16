@@ -65,9 +65,9 @@ class PystProcess():
         else:
             print(f"Im the parent, there is a new child {self.child}")
 
-    def get_status(self):
+    def get_status(self, poll=2):
 
-        for i in range(20):
+        for i in range(poll*10):
             pid,status = os.waitpid(self.child, os.WNOHANG)
             #print(pid,status)
             if (pid,status) == (0,0):
@@ -78,9 +78,9 @@ class PystProcess():
                     exitstatus = os.WEXITSTATUS(status)
                     print("Exit status of background process", exitstatus)
                     return exitstatus
-            time.sleep(0.2)
+            time.sleep(0.1)
 
-        return status
+        return None
 
     def terminate(self):
         if debug:

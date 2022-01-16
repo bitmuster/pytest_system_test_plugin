@@ -29,3 +29,14 @@ def test_run_background_echo_hello_fail(process):
     process.set_config( ['/usr/bin/sh', '-c', '/usr/bin/sleep 1 ; false'] )
     process.run_bg()
     assert process.get_status() == 1
+
+def test_run_background_status_poll_fails(process):
+    process.set_config( ['/usr/bin/sleep', '3'] )
+    process.run_bg()
+    assert process.get_status() == None
+
+def test_run_background_status_poll(process):
+    process.set_config( ['/usr/bin/sleep', '3'] )
+    process.run_bg()
+    assert process.get_status(poll=4) == 0
+
