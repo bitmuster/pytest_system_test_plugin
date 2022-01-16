@@ -5,8 +5,8 @@ import subprocess
 
 debug = False
 
-class PystProcess():
 
+class PystProcess:
     def __init__(self, config):
         self.config = config
         if debug:
@@ -30,25 +30,25 @@ class PystProcess():
     def run(self):
         if debug:
             print(f"    Process: run: {self.config}")
-        self.proc = subprocess.run(self.config,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+        self.proc = subprocess.run(
+            self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
-        stdout = os.path.join( os.path.dirname(__file__), "stdout.out")
+        stdout = os.path.join(os.path.dirname(__file__), "stdout.out")
         with open(stdout, "bw") as outfile:
             outfile.write(self.proc.stdout)
 
-        stderr = os.path.join( os.path.dirname(__file__), "stderr.out")
+        stderr = os.path.join(os.path.dirname(__file__), "stderr.out")
         with open(stderr, "bw") as outfile:
             outfile.write(self.proc.stderr)
 
         return self.proc.returncode
 
     def run_bg(self):
-        self.outfile = os.path.abspath('./out/stdout.out')
-        self.errfile = os.path.abspath('./out/stderr.out')
-        #self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
-        #self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
+        self.outfile = os.path.abspath("./out/stdout.out")
+        self.errfile = os.path.abspath("./out/stderr.out")
+        # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
+        # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
         self.cmd = self.config
         self.newenv = {}
         self.child = os.fork()
@@ -57,8 +57,8 @@ class PystProcess():
             flags = os.O_CREAT | os.O_TRUNC | os.O_WRONLY
             out = os.open(self.outfile, flags)
             err = os.open(self.errfile, flags)
-            os.dup2(out, 1) # Duplicate stdout to the the descriptor
-            os.dup2(err, 2) # Duplicate stderr the descriptor
+            os.dup2(out, 1)  # Duplicate stdout to the the descriptor
+            os.dup2(err, 2)  # Duplicate stderr the descriptor
             os.setpgrp()
             print("Im the child, one line before execve")
             os.execve(self.cmd[0], self.cmd, self.newenv)
@@ -67,10 +67,10 @@ class PystProcess():
 
     def get_status(self, poll=2):
 
-        for i in range(poll*10):
-            pid,status = os.waitpid(self.child, os.WNOHANG)
-            #print(pid,status)
-            if (pid,status) == (0,0):
+        for i in range(poll * 10):
+            pid, status = os.waitpid(self.child, os.WNOHANG)
+            # print(pid,status)
+            if (pid, status) == (0, 0):
                 if debug:
                     print(f"No status available for child {self.child}")
             else:

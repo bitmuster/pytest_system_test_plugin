@@ -2,6 +2,8 @@ import pytest
 from .pyst_process import PystProcess
 
 debug = False
+
+
 @pytest.fixture
 def process():
     if debug:
@@ -10,4 +12,3 @@ def process():
     yield PystProcess("true")
     if debug:
         print("    <<<< We kill a process")
-
