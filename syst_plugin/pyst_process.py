@@ -20,6 +20,9 @@ class PystProcess:
         self.background = None
         logging.debug("    A new process: %s", self.config)
 
+        self.outfile = os.path.join(os.path.dirname(__file__), "out/stdout.out")
+        self.errfile = os.path.join(os.path.dirname(__file__), "out/stderr.out")
+
     def set_config(self, config):
         """Set the arguments of the process.
         TODO: Do we have a better method to pass arguments without the factory?
@@ -31,9 +34,8 @@ class PystProcess:
 
     def get_stdout(self):
         if self.background:
-            stdout = os.path.join(os.path.dirname(__file__), "out/stdout.out")
-            assert os.path.exists(stdout)
-            with open(stdout, encoding="utf-8") as out:
+            assert os.path.exists(self.outfile)
+            with open(self.outfile, encoding="utf-8") as out:
                 content = out.read()
                 return content.strip()
         else:
@@ -41,9 +43,8 @@ class PystProcess:
 
     def get_stderr(self):
         if self.background:
-            stderr = os.path.join(os.path.dirname(__file__), "out/stderr.out")
-            assert os.path.exists(stderr)
-            with open(stderr, encoding="utf-8") as err:
+            assert os.path.exists(self.errfile)
+            with open(self.errfile, encoding="utf-8") as err:
                 content = err.read()
                 return content.strip()
         else:
@@ -60,13 +61,11 @@ class PystProcess:
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
-        stdout = os.path.join(os.path.dirname(__file__), "out/stdout.out")
-        with open(stdout, "bw") as outfile:
-            outfile.write(self.proc.stdout)
+        with open(self.outfile, "bw") as out:
+            out.write(self.proc.stdout)
 
-        stderr = os.path.join(os.path.dirname(__file__), "out/stderr.out")
-        with open(stderr, "bw") as outfile:
-            outfile.write(self.proc.stderr)
+        with open(self.errfile, "bw") as out:
+            out.write(self.proc.stderr)
 
         self.returncode = self.proc.returncode
         return self.proc.returncode
@@ -84,9 +83,6 @@ class PystProcess:
             os.mkdir( os.path.join(os.path.dirname(__file__), "out"))
         except FileExistsError:
             pass
-
-        self.outfile = os.path.join(os.path.dirname(__file__), "out/stdout.out")
-        self.errfile = os.path.join(os.path.dirname(__file__), "out/stderr.out")
 
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
