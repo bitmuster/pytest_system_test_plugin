@@ -24,6 +24,12 @@ def test_kill_on_not_existing():
     assert pystp.kill() is None
 
 
+def test_set_name():
+    pystp = PystProcess(["theone"])
+    pystp.set_name("one")
+    assert pystp.get_name() == "one"
+
+
 def test_echo():
     pystp = PystProcess(["echo", "hello", "world"])
     pystp.run()

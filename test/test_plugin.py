@@ -55,6 +55,7 @@ def test_run_background_status_poll(process):
     process.run_bg()
     assert process.get_status(poll=1) == 0
 
+
 def test_proc_factory(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])
     proc2 = process_factory(["/usr/bin/sleep", "101"])
@@ -108,6 +109,7 @@ def test_proc_factory_was_never_started(process_factory):
         proc1.run_bg()
     assert proc1.get_status(5) == None
     assert proc1.get_returncode() == None
+
 
 def test_grep_stdout_fg(process):
     process.set_config(["echo", "hello", "world"])

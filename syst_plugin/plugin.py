@@ -10,7 +10,9 @@ from .pyst_process import PystProcess
 
 @pytest.fixture
 def process(request):
-    """process base fixture"""
+    """process base fixture
+    Issue: When used multiple time in one test it will return cached results !!!
+    """
     logging.debug("    >>>> We call a process")
     # So far, until we have nice mechanics to modify this we only run true
     yield PystProcess("true", testname=request.node.name)

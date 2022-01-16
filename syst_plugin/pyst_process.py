@@ -30,6 +30,12 @@ class PystProcess:
         self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
         self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
+
     def set_config(self, config):
         """Set the arguments of the process.
         TODO: Do we have a better method to pass arguments without the factory?
