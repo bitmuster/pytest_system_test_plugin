@@ -19,3 +19,10 @@ def test_echo_hello(process):
     assert process.get_stdout() == "hello world"
     assert process.get_returncode() == 0
 
+
+def test_run_background_echo_hello(process):
+    process.set_config(["echxo", "hello", "world"])
+    process.run_bg()
+    assert process.get_status() == 1
+    #assert process.get_stdout() == "hello world"
+    #assert process.get_returncode() == 0
