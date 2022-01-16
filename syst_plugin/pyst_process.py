@@ -13,15 +13,27 @@ import time
 
 
 class PystProcess:
-    def __init__(self, config):
+    def __init__(self, config, testname=None):
         self.config = config
         self.child = None
         self.returncode = None
         self.background = None
+
+        if testname:
+            self.testname = testname
+        else:
+            self.testname = "Noname"
+
+        self.testdir = os.path.join(os.path.dirname(__file__), "out", self.testname)
+
         logging.debug("    A new process: %s", self.config)
 
-        self.outfile = os.path.join(os.path.dirname(__file__), "out/stdout.out")
-        self.errfile = os.path.join(os.path.dirname(__file__), "out/stderr.out")
+        self.outfile = os.path.join(
+            os.path.dirname(__file__), "out", self.testname, "stdout.out"
+        )
+        self.errfile = os.path.join(
+            os.path.dirname(__file__), "out", self.testname, "stderr.out"
+        )
 
     def set_config(self, config):
         """Set the arguments of the process.
@@ -60,6 +72,11 @@ class PystProcess:
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
+        try:
+            os.makedirs(self.testdir)
+        except FileExistsError:
+            pass
+
         with open(self.outfile, "bw") as out:
             out.write(self.proc.stdout)
 
@@ -74,14 +91,18 @@ class PystProcess:
         TODO: Maybe merge with run()
         Note: Unlike run we need the full path of the binary here
         """
+
         self.background = True
         if not os.path.exists(self.config[0]):
             raise SystemError("Programm %s is not exiting", self.config[0])
-
         try:
-            os.mkdir(os.path.join(os.path.dirname(__file__), "out"))
+            os.makedirs(self.testdir)
         except FileExistsError:
             pass
+        # really make sure they are there if we fork and find out then,
+        # we have N forked pytests running
+        assert os.path.exists(os.path.dirname(self.outfile))
+        assert os.path.exists(os.path.dirname(self.errfile))
 
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']

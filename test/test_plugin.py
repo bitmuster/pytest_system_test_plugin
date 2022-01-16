@@ -183,7 +183,7 @@ def test_grep_stdout_bg(process):
     assert process.get_status() == 0
     assert process.background is True
     assert process.get_stdout() == "hello worldpeace"
-    # assert process.get_returncode() == 0
+    assert process.get_returncode() == 0
 
 
 def test_grep_stderr_bg(process):
@@ -197,4 +197,4 @@ def test_grep_stderr_bg(process):
         process.get_stderr()
         == "/usr/bin/ls: cannot access 'notthere': No such file or directory"
     )
-    # assert process.get_returncode() == 0
+    assert process.get_returncode() == 2
