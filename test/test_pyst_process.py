@@ -38,6 +38,15 @@ def test_true():
     assert pystp.get_returncode() == 0
 
 
+def test_true_with_name():
+    pystp = PystProcess("true", name="Bob_")
+    pystp.run()
+    assert pystp.get_stdout() == ""
+    assert pystp.get_returncode() == 0
+    assert pystp.outfile.endswith("Bob_stdout.out")
+    assert pystp.errfile.endswith("Bob_stderr.out")
+
+
 def test_false():
     pystp = PystProcess("false")
     pystp.run()

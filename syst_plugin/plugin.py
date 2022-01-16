@@ -23,9 +23,9 @@ def process_factory(request):
 
     processes = []
 
-    def _make_process(cmd):
+    def _make_process(cmd, name="nonamegiven"):
         logging.debug("    >>>>>>>> We generate a process")
-        proc = PystProcess(cmd, testname=request.node.name)
+        proc = PystProcess(cmd, testname=request.node.name, name=name)
         processes.append(proc)
         return proc
 

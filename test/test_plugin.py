@@ -78,26 +78,34 @@ def echoserver(process):
     logging.info("Killing echoserver")
     process.kill()
 
+
 @pytest.fixture
 def asserts_echoserver():
     yield
     logging.info("Asserts Echoserver")
+
 
 @pytest.fixture
 def cleanup_echoserver():
     yield
     logging.info("Cleanup Echoserver")
 
+
 def test_use_case_echo(echoserver):
     echoserver.run_bg()
     time.sleep(1)
     echoserver.kill()
+    # If this fails, there is maybe still one running
     assert echoserver.get_status() == "NotExisting"
 
-def test_use_case_echo_with_additional_cleanup(echoserver, asserts_echoserver, cleanup_echoserver):
+
+def test_use_case_echo_with_additional_cleanup(
+    echoserver, asserts_echoserver, cleanup_echoserver
+):
     # Does not work right
     echoserver.run_bg()
     time.sleep(0.1)
+
 
 def test_proc_factory(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])
@@ -107,6 +115,13 @@ def test_proc_factory(process_factory):
     time.sleep(0.1)
     proc1.kill()
     proc2.kill()
+
+
+def test_proc_factory_with_prefix(process_factory):
+    proc1 = process_factory(["/usr/bin/sleep", "100"], name="hundred")
+    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    proc1.run_bg()
+    proc2.run_bg()
 
 
 def test_proc_factory_autokill(process_factory):
@@ -185,7 +200,7 @@ def test_use_case_echo_and_curl_from_factory(process_factory, process):
         ]
     )
     server.run_bg()
-    assert server.get_status() == "Running" # make sure it still runs
+    assert server.get_status() == "Running"  # make sure it still runs
     # give the server 100ms to start in the background
     time.sleep(0.1)
     client = process_factory(

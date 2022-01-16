@@ -13,27 +13,22 @@ import time
 
 
 class PystProcess:
-    def __init__(self, config, testname=None):
+    def __init__(self, config, testname="unnamed_", name="unnamed_"):
         self.config = config
         self.child = None
         self.returncode = None
         self.background = None
 
-        if testname:
-            self.testname = testname
-        else:
-            self.testname = "Noname"
+        self.testname = testname
+
+        self.name = name
 
         self.testdir = os.path.join(os.path.dirname(__file__), "out", self.testname)
 
         logging.debug("    A new process: %s", self.config)
 
-        self.outfile = os.path.join(
-            os.path.dirname(__file__), "out", self.testname, "stdout.out"
-        )
-        self.errfile = os.path.join(
-            os.path.dirname(__file__), "out", self.testname, "stderr.out"
-        )
+        self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
+        self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
     def set_config(self, config):
         """Set the arguments of the process.
@@ -150,8 +145,10 @@ class PystProcess:
                 return "NotExisting"
             # print(pid,status)
             if (pid, status) == (0, 0):
-                logging.debug("No status available for child %s probably still running",
-                        self.child)
+                logging.debug(
+                    "No status available for child %s probably still running",
+                    self.child,
+                )
                 status = "Running"
             else:
                 if os.WIFEXITED(status):
@@ -176,4 +173,3 @@ class PystProcess:
         else:
             print("Ret", self.returncode)
             os.kill(self.child, signal.SIGKILL)
-
