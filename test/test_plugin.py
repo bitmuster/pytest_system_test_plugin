@@ -21,8 +21,11 @@ def test_echo_hello(process):
 
 
 def test_run_background_echo_hello(process):
-    process.set_config(["echxo", "hello", "world"])
+    process.set_config( ['/usr/bin/sh', '-c', '/usr/bin/sleep 1'] )
+    process.run_bg()
+    assert process.get_status() == 0
+
+def test_run_background_echo_hello_fail(process):
+    process.set_config( ['/usr/bin/sh', '-c', '/usr/bin/sleep 1 ; false'] )
     process.run_bg()
     assert process.get_status() == 1
-    #assert process.get_stdout() == "hello world"
-    #assert process.get_returncode() == 0

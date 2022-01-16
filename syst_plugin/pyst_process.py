@@ -48,7 +48,8 @@ class PystProcess():
         self.outfile = os.path.abspath('./out/stdout.out')
         self.errfile = os.path.abspath('./out/stderr.out')
         #self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
-        self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
+        #self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
+        self.cmd = self.config
         self.newenv = {}
         self.child = os.fork()
         if self.child == 0:
@@ -68,13 +69,14 @@ class PystProcess():
 
         for i in range(20):
             pid,status = os.waitpid(self.child, os.WNOHANG)
-            print(pid,status)
+            #print(pid,status)
             if (pid,status) == (0,0):
-                print(f"No status available for child {self.child}")
+                if debug:
+                    print(f"No status available for child {self.child}")
             else:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)
-                    print("Exitstatus", exitstatus)
+                    print("Exit status of background process", exitstatus)
                     return exitstatus
             time.sleep(0.2)
 
