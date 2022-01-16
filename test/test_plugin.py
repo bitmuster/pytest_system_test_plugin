@@ -1,7 +1,7 @@
+import logging
 import os
 import os.path
 import time
-
 import pytest
 
 
@@ -56,7 +56,11 @@ def test_run_background_status_poll(process):
     assert process.get_status(poll=1) == 0
 
 
-def test_use_case_echo(process):
+@pytest.fixture
+def echoserver(process):
+    """
+    Custom fixture
+    """
     # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
     process.set_config(
@@ -70,10 +74,30 @@ def test_use_case_echo(process):
             "8080",
         ]
     )
-    process.run_bg()
-    time.sleep(1)
+    yield process
+    logging.info("Killing echoserver")
     process.kill()
 
+@pytest.fixture
+def asserts_echoserver():
+    yield
+    logging.info("Asserts Echoserver")
+
+@pytest.fixture
+def cleanup_echoserver():
+    yield
+    logging.info("Cleanup Echoserver")
+
+def test_use_case_echo(echoserver):
+    echoserver.run_bg()
+    time.sleep(1)
+    echoserver.kill()
+    assert echoserver.get_status() == "NotExisting"
+
+def test_use_case_echo_with_additional_cleanup(echoserver, asserts_echoserver, cleanup_echoserver):
+    # Does not work right
+    echoserver.run_bg()
+    time.sleep(0.1)
 
 def test_proc_factory(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])

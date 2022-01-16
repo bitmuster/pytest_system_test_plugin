@@ -134,7 +134,8 @@ class PystProcess:
     def get_status(self, poll=1):
         """Returns the returncode of the process and polls if it hasn't yet
         finished.
-        Will "Running" if the process is still running.
+        Returns "Running" if the process is still running.
+        Returns "NotExisting" if the process does not exist anyore.
         """
         if self.child is None:
             return None
@@ -146,7 +147,7 @@ class PystProcess:
             except ChildProcessError:
                 logging.warning("Process %i is not existing", self.child)
                 self.child = None
-                return None
+                return "NotExisting"
             # print(pid,status)
             if (pid, status) == (0, 0):
                 logging.debug("No status available for child %s probably still running",
@@ -175,3 +176,4 @@ class PystProcess:
         else:
             print("Ret", self.returncode)
             os.kill(self.child, signal.SIGKILL)
+
