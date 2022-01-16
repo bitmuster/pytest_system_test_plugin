@@ -77,5 +77,3 @@ def test_stdout_file():
     )
     with open(content, encoding="utf-8") as out:
         assert out.read().strip() == exp
-
-

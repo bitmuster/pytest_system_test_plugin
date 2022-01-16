@@ -74,6 +74,7 @@ def test_use_case_echo(process):
     time.sleep(1)
     process.kill()
 
+
 def test_proc_factory(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])
     proc2 = process_factory(["/usr/bin/sleep", "101"])
@@ -83,11 +84,13 @@ def test_proc_factory(process_factory):
     proc1.kill()
     proc2.kill()
 
+
 def test_proc_factory_autokill(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])
     proc2 = process_factory(["/usr/bin/sleep", "101"])
     proc1.run_bg()
     proc2.run_bg()
+
 
 def test_proc_factory_one_not_called(process_factory):
     # Test will pass and we will see a warning in pytest
@@ -96,14 +99,16 @@ def test_proc_factory_one_not_called(process_factory):
     proc2 = process_factory(["/usr/bin/sleep", "101"])
     proc1.run_bg()
 
+
 def test_proc_factory_has_exited_with_error(process_factory):
-    #args = ["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"]
+    # args = ["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"]
     args = ["/usr/bin/false"]
     proc1 = process_factory(args)
     proc1.run_bg()
     assert proc1.get_status(5) == 1
     assert proc1.get_returncode() == 1
     time.sleep(1)
+
 
 def test_proc_factory_was_never_started(process_factory):
     # Will happen when we call without the full path or invalid arguents.
@@ -116,6 +121,7 @@ def test_proc_factory_was_never_started(process_factory):
         proc1.run_bg()
     assert proc1.get_status(5) == None
     assert proc1.get_returncode() == None
+
 
 def test_use_case_echo_and_curl(process_factory, process):
     # TODO: Find bette way of getting an interpreter in the current env
@@ -134,7 +140,9 @@ def test_use_case_echo_and_curl(process_factory, process):
     server.run_bg()
     # give the server 100ms to start in the background
     time.sleep(0.1)
-    process.set_config( "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split())
+    process.set_config(
+        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split()
+    )
     assert process.run() == 0
 
 
@@ -155,8 +163,11 @@ def test_use_case_echo_and_curl_from_factory(process_factory, process):
     server.run_bg()
     # give the server 100ms to start in the background
     time.sleep(0.1)
-    client = process_factory( "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split())
+    client = process_factory(
+        "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split()
+    )
     client.run_bg()
+
 
 def test_grep_stdout_fg(process):
     process.set_config(["echo", "hello", "world"])
@@ -164,22 +175,26 @@ def test_grep_stdout_fg(process):
     assert process.get_stdout() == "hello world"
     assert process.get_returncode() == 0
 
+
 def test_grep_stdout_bg(process):
     process.set_config(["/usr/bin/echo", "hello", "worldpeace"])
     process.run_bg()
-    #time.sleep(0.1)
+    # time.sleep(0.1)
     assert process.get_status() == 0
     assert process.background is True
     assert process.get_stdout() == "hello worldpeace"
-    #assert process.get_returncode() == 0
+    # assert process.get_returncode() == 0
+
 
 def test_grep_stderr_bg(process):
     # process.set_config(["/bin/sh", "-c", "echo not found", ">&2"])
     process.set_config(["/usr/bin/ls", "notthere"])
     process.run_bg()
-    #time.sleep(0.1)
+    # time.sleep(0.1)
     assert process.get_status() == 2
     assert process.background is True
-    assert process.get_stderr() == "/usr/bin/ls: cannot access 'notthere': No such file or directory"
-    #assert process.get_returncode() == 0
-
+    assert (
+        process.get_stderr()
+        == "/usr/bin/ls: cannot access 'notthere': No such file or directory"
+    )
+    # assert process.get_returncode() == 0

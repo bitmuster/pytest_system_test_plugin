@@ -54,8 +54,7 @@ class PystProcess:
         return self.returncode
 
     def run(self):
-        """Run process in the foreground
-        """
+        """Run process in the foreground"""
         logging.debug("    Process: run: %s", self.config)
         self.proc = subprocess.run(
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -80,7 +79,7 @@ class PystProcess:
             raise SystemError("Programm %s is not exiting", self.config[0])
 
         try:
-            os.mkdir( os.path.join(os.path.dirname(__file__), "out"))
+            os.mkdir(os.path.join(os.path.dirname(__file__), "out"))
         except FileExistsError:
             pass
 
@@ -105,7 +104,7 @@ class PystProcess:
                 os.execve(self.cmd[0], self.cmd, self.newenv)
             except Exception as exception:
                 logging.error("Caught excepton on execve: %s", exception)
-                #raise exception
+                # raise exception
                 logging.error("Will die now")
                 os.abort()
         else:
@@ -119,7 +118,7 @@ class PystProcess:
         if self.child is None:
             return None
 
-        for _ in range(poll*10):
+        for _ in range(poll * 10):
             try:
                 pid, status = os.waitpid(self.child, os.WNOHANG)
             except ChildProcessError:
@@ -146,8 +145,9 @@ class PystProcess:
         elif self.child is None:
             logging.warning("Child was never called, won't kill it")
         elif self.returncode != None:
-            logging.warning("Chiild has already quit with %s, won't kill it",
-                    self.returncode)
+            logging.warning(
+                "Chiild has already quit with %s, won't kill it", self.returncode
+            )
         else:
             print("Ret", self.returncode)
             os.kill(self.child, signal.SIGKILL)
