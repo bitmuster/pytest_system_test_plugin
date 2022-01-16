@@ -1,5 +1,6 @@
 import os
 import os.path
+import time
 import pytest
 from syst_plugin.pyst_process import PystProcess
 
@@ -75,3 +76,14 @@ def test_stdout_file():
     )
     with open(content, encoding="utf-8") as out:
         assert out.read().strip() == exp
+
+def test_proc_factory(process_factory):
+    proc1 = process_factory(["/usr/bin/sleep", "100"])
+    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    proc1.run_bg()
+    proc2.run_bg()
+    time.sleep(1)
+    proc1.kill()
+    proc2.kill()
+
+

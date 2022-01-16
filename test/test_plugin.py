@@ -56,6 +56,7 @@ def test_run_background_status_poll(process):
 
 
 def test_use_case_echo(process):
+    # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
     process.set_config(
         [
@@ -69,6 +70,29 @@ def test_use_case_echo(process):
         ]
     )
     process.run_bg()
-    # assert process.get_status(poll=4) == 0
     time.sleep(1)
     process.kill()
+
+
+def test_use_case_echo_and_curl(process):
+    # TODO: Find bette way of getting an interpreter in the current env
+    interpreter = os.path.abspath("./env-plugin/bin/python")
+    process.set_config(
+        [
+            interpreter,
+            "-m",
+            "restapi_echo_server",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080",
+        ]
+    )
+    process.run_bg()
+
+    "curl -X POST http://localhost:8080 -d hello_my_plugins"
+
+    time.sleep(1)
+    process.kill()
+
+
