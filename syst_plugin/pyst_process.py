@@ -16,9 +16,13 @@ class PystProcess:
     def __init__(self, config):
         self.config = config
         self.child = None
+        self.returncode = None
         logging.debug("    A new process: %s", self.config)
 
     def set_config(self, config):
+        """Set the arguments of the process.
+        TODO: Do we have a better method to pass arguments without the factory?
+        """
         self.config = config
 
     def get_config(self):
@@ -31,9 +35,11 @@ class PystProcess:
         return self.proc.stderr.decode(encoding="utf-8").strip()
 
     def get_returncode(self):
-        return self.proc.returncode
+        return self.returncode
 
     def run(self):
+        """Run process in the foreground
+        """
         logging.debug("    Process: run: %s", self.config)
         self.proc = subprocess.run(
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -47,9 +53,13 @@ class PystProcess:
         with open(stderr, "bw") as outfile:
             outfile.write(self.proc.stderr)
 
+        self.returncode = self.proc.returncode
         return self.proc.returncode
 
     def run_bg(self):
+        """Run process in the background
+        TODO: Maybe merge with run()
+        """
         self.outfile = os.path.abspath("./out/stdout.out")
         self.errfile = os.path.abspath("./out/stderr.out")
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
@@ -71,7 +81,10 @@ class PystProcess:
             logging.info("Im the parent, there is a new child %s", self.child)
 
     def get_status(self, poll=1):
-
+        """Returns the returncode of the process and polls if it hasn't yet
+        finished.
+        Will return None if the process is still running.
+        """
         for _ in range(poll*10):
             pid, status = os.waitpid(self.child, os.WNOHANG)
             # print(pid,status)
@@ -81,6 +94,7 @@ class PystProcess:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)
                     logging.info("Exit status of background process %s", exitstatus)
+                    self.returncode = exitstatus
                     return exitstatus
             time.sleep(0.1)
 
@@ -89,6 +103,8 @@ class PystProcess:
     def kill(self):
         logging.debug("    Process: terminate: %s", self.config)
         if self.child is None:
-            logging.warn("Chiild was never called, won't kill it")
+            logging.warning("Chiild was never called, won't kill it")
+        elif self.returncode != None:
+            logging.warning("Chiild has already quit, won't kill it")
         else:
             os.kill(self.child, signal.SIGKILL)

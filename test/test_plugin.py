@@ -95,6 +95,13 @@ def test_proc_factory_one_not_called(process_factory):
     proc2 = process_factory(["/usr/bin/sleep", "101"])
     proc1.run_bg()
 
+def test_proc_factory_has_exited_with_error(process_factory):
+    args = ["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"]
+    proc1 = process_factory(args)
+    proc1.run_bg()
+    assert proc1.get_status(5) == 1
+    assert proc1.get_returncode() == 1
+
 def test_use_case_echo_and_curl(process_factory, process):
     # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
