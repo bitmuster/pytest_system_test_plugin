@@ -1,7 +1,5 @@
 .tox
 env-plugin
 **/*.pyc
-syst_plugin/stdout.out
-syst_plugin/stderr.out
 pytest_system_test_plugin.egg-info
 

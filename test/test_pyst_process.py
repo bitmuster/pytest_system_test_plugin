@@ -17,9 +17,10 @@ def test_get_set_config():
     assert pystp.get_config() == 77
 
 
-def test_terminate():
-    pystp = PystProcess(["read"])
-    pystp.run_bg()
+def test_kill_on_not_existing():
+    pystp = PystProcess(["notexist"])
+    with pytest.raises(SystemError):
+        pystp.run_bg()
     assert pystp.kill() is None
 
 
@@ -60,7 +61,7 @@ def test_stderr_file():
     pystp = PystProcess(["ls", "notthere"])
     pystp.run()
     content = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../syst_plugin/stderr.out")
+        os.path.join(os.path.dirname(__file__), "../syst_plugin/out/stderr.out")
     )
     print(content)
     with open(content, encoding="utf-8") as out:
@@ -72,7 +73,7 @@ def test_stdout_file():
     pystp = PystProcess(["echo", "hello", "world"])
     pystp.run()
     content = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../syst_plugin/stdout.out")
+        os.path.join(os.path.dirname(__file__), "../syst_plugin/out/stdout.out")
     )
     with open(content, encoding="utf-8") as out:
         assert out.read().strip() == exp

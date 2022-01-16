@@ -26,6 +26,8 @@ Features should be (intended, unfinished):
     * Supports you to write your own fixures
 
 
+So far, this will only un on unix-like systems.
+
 ## Prepare
 
     python3 -m venv env-plugin

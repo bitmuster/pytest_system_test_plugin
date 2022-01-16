@@ -17,6 +17,7 @@ class PystProcess:
         self.config = config
         self.child = None
         self.returncode = None
+        self.background = None
         logging.debug("    A new process: %s", self.config)
 
     def set_config(self, config):
@@ -29,10 +30,24 @@ class PystProcess:
         return self.config
 
     def get_stdout(self):
-        return self.proc.stdout.decode(encoding="utf-8").strip()
+        if self.background:
+            stdout = os.path.join(os.path.dirname(__file__), "out/stdout.out")
+            assert os.path.exists(stdout)
+            with open(stdout, encoding="utf-8") as out:
+                content = out.read()
+                return content.strip()
+        else:
+            return self.proc.stdout.decode(encoding="utf-8").strip()
 
     def get_stderr(self):
-        return self.proc.stderr.decode(encoding="utf-8").strip()
+        if self.background:
+            stderr = os.path.join(os.path.dirname(__file__), "out/stderr.out")
+            assert os.path.exists(stderr)
+            with open(stderr, encoding="utf-8") as err:
+                content = err.read()
+                return content.strip()
+        else:
+            return self.proc.stderr.decode(encoding="utf-8").strip()
 
     def get_returncode(self):
         return self.returncode
@@ -45,11 +60,11 @@ class PystProcess:
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
-        stdout = os.path.join(os.path.dirname(__file__), "stdout.out")
+        stdout = os.path.join(os.path.dirname(__file__), "out/stdout.out")
         with open(stdout, "bw") as outfile:
             outfile.write(self.proc.stdout)
 
-        stderr = os.path.join(os.path.dirname(__file__), "stderr.out")
+        stderr = os.path.join(os.path.dirname(__file__), "out/stderr.out")
         with open(stderr, "bw") as outfile:
             outfile.write(self.proc.stderr)
 
@@ -59,9 +74,20 @@ class PystProcess:
     def run_bg(self):
         """Run process in the background
         TODO: Maybe merge with run()
+        Note: Unlike run we need the full path of the binary here
         """
-        self.outfile = os.path.abspath("./out/stdout.out")
-        self.errfile = os.path.abspath("./out/stderr.out")
+        self.background = True
+        if not os.path.exists(self.config[0]):
+            raise SystemError("Programm %s is not exiting", self.config[0])
+
+        try:
+            os.mkdir( os.path.join(os.path.dirname(__file__), "out"))
+        except FileExistsError:
+            pass
+
+        self.outfile = os.path.join(os.path.dirname(__file__), "out/stdout.out")
+        self.errfile = os.path.join(os.path.dirname(__file__), "out/stderr.out")
+
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
         self.cmd = self.config
@@ -75,8 +101,17 @@ class PystProcess:
             os.dup2(out, 1)  # Duplicate stdout to the the descriptor
             os.dup2(err, 2)  # Duplicate stderr the descriptor
             os.setpgrp()
-            logging.info("Im the child, one line before execve")
-            os.execve(self.cmd[0], self.cmd, self.newenv)
+
+            # Disabled, will make grepping more complicated
+            # logging.debug("Im the child, one line before execve")
+
+            try:
+                os.execve(self.cmd[0], self.cmd, self.newenv)
+            except Exception as exception:
+                logging.error("Caught excepton on execve: %s", exception)
+                #raise exception
+                logging.error("Will die now")
+                os.abort()
         else:
             logging.info("Im the parent, there is a new child %s", self.child)
 
@@ -85,8 +120,16 @@ class PystProcess:
         finished.
         Will return None if the process is still running.
         """
+        if self.child is None:
+            return None
+
         for _ in range(poll*10):
-            pid, status = os.waitpid(self.child, os.WNOHANG)
+            try:
+                pid, status = os.waitpid(self.child, os.WNOHANG)
+            except ChildProcessError:
+                logging.warning("Process %i is not existing", self.child)
+                self.child = None
+                return None
             # print(pid,status)
             if (pid, status) == (0, 0):
                 logging.debug("No status available for child %s", self.child)
@@ -102,9 +145,13 @@ class PystProcess:
 
     def kill(self):
         logging.debug("    Process: terminate: %s", self.config)
-        if self.child is None:
-            logging.warning("Chiild was never called, won't kill it")
+        if self.child == 0:
+            logging.error("Somebody tried to kill the parent process")
+        elif self.child is None:
+            logging.warning("Child was never called, won't kill it")
         elif self.returncode != None:
-            logging.warning("Chiild has already quit, won't kill it")
+            logging.warning("Chiild has already quit with %s, won't kill it",
+                    self.returncode)
         else:
+            print("Ret", self.returncode)
             os.kill(self.child, signal.SIGKILL)
