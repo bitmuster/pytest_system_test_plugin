@@ -7,14 +7,14 @@ from syst_plugin.pyst_process import PystProcess
 
 def test_init():
     pystp = PystProcess(22)
-    assert pystp.get_config() == 22
+    assert pystp.get_command() == 22
 
 
-def test_get_set_config():
+def test_get_set_command():
     pystp = PystProcess(33)
-    assert pystp.get_config() == 33
-    pystp.set_config(77)
-    assert pystp.get_config() == 77
+    assert pystp.get_command() == 33
+    pystp.set_command(77)
+    assert pystp.get_command() == 77
 
 
 def test_kill_on_not_existing():

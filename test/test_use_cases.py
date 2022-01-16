@@ -97,7 +97,7 @@ def test_use_case_echo_and_curl(process_factory, process):
     server.run_bg()
     # give the server 100ms to start in the background
     time.sleep(0.1)
-    process.set_config(
+    process.set_command(
         "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split()
     )
     assert process.run() == 0

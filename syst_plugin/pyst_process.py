@@ -13,11 +13,14 @@ import time
 
 
 class PystProcess:
-    def __init__(self, config, testname="unnamed_", name="unnamed_"):
-        self.config = config
+    """Class to manage Pytest system-test processes"""
+
+    def __init__(self, command, testname="unnamed_", name="unnamed_"):
         self.child = None
         self.returncode = None
         self.background = None
+        self.proc = None
+        self.command = command
 
         self.testname = testname
 
@@ -25,7 +28,7 @@ class PystProcess:
 
         self.testdir = os.path.join(os.path.dirname(__file__), "out", self.testname)
 
-        logging.debug("    A new process: %s", self.config)
+        logging.debug("    A new process: %s", self.command)
 
         self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
         self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
@@ -36,14 +39,14 @@ class PystProcess:
     def get_name(self):
         return self.name
 
-    def set_config(self, config):
+    def set_command(self, command):
         """Set the arguments of the process.
         TODO: Do we have a better method to pass arguments without the factory?
         """
-        self.config = config
+        self.command = command
 
-    def get_config(self):
-        return self.config
+    def get_command(self):
+        return self.command
 
     def get_stdout(self):
         if self.background:
@@ -68,10 +71,13 @@ class PystProcess:
 
     def run(self):
         """Run process in the foreground"""
-        logging.debug("    Process: run: %s", self.config)
+        logging.debug("    Process: run: %s", self.command)
+        # try:
         self.proc = subprocess.run(
-            self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            self.command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False
         )
+        # except subprocess.CalledProcessError as ex:
+        #    pass
 
         try:
             os.makedirs(self.testdir)
@@ -94,8 +100,8 @@ class PystProcess:
         """
 
         self.background = True
-        if not os.path.exists(self.config[0]):
-            raise SystemError("Programm %s is not exiting", self.config[0])
+        if not os.path.exists(self.command[0]):
+            raise SystemError("Programm is not exiting: ", self.command[0])
         try:
             os.makedirs(self.testdir)
         except FileExistsError:
@@ -107,7 +113,6 @@ class PystProcess:
 
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
-        self.cmd = self.config
         self.newenv = {}
         self.child = os.fork()
         if self.child == 0:
@@ -123,8 +128,8 @@ class PystProcess:
             # logging.debug("Im the child, one line before execve")
 
             try:
-                os.execve(self.cmd[0], self.cmd, self.newenv)
-            except Exception as exception:
+                os.execve(self.command[0], self.command, self.newenv)
+            except OSError as exception:
                 logging.error("Caught excepton on execve: %s", exception)
                 # raise exception
                 logging.error("Will die now")
@@ -167,14 +172,16 @@ class PystProcess:
         return status
 
     def kill(self):
-        logging.debug("    Process: terminate: %s", self.config)
+        logging.debug("    Process: terminate: %s", self.command)
         if self.child == 0:
             logging.error("Somebody tried to kill the parent process")
         elif self.child is None:
             logging.warning("Child was never called, won't kill it")
-        elif self.returncode != None:
+        elif self.returncode is not None:
             logging.warning(
-                "Chiild has already quit with %s, won't kill it", self.returncode
+                "Child %s has already quit with %s, won't kill it",
+                self.child,
+                self.returncode,
             )
         else:
             print("Ret", self.returncode)

@@ -9,49 +9,49 @@ def test_process_run(process):
     assert process.run() == 0
 
 
-def test_process_set_config(process):
-    process.set_config(33)
-    assert process.get_config() == 33
+def test_process_set_command(process):
+    process.set_command(33)
+    assert process.get_command() == 33
 
 
-def test_process_get_config(process):
-    assert process.get_config() == "true"
+def test_process_get_command(process):
+    assert process.get_command() == "true"
 
 
 def test_process_kill(process):
-    process.set_config("read")
+    process.set_command("read")
     with pytest.raises(SystemError):
         process.run_bg()
     assert process.kill() is None
 
 
 def test_echo_hello(process):
-    process.set_config(["echo", "hello", "world"])
+    process.set_command(["echo", "hello", "world"])
     process.run()
     assert process.get_stdout() == "hello world"
     assert process.get_returncode() == 0
 
 
 def test_run_background_echo_hello(process):
-    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1"])
+    process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1"])
     process.run_bg()
     assert process.get_status() == 0
 
 
 def test_run_background_echo_hello_fail(process):
-    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"])
+    process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"])
     process.run_bg()
     assert process.get_status() == 1
 
 
 def test_run_background_status_poll_fails(process):
-    process.set_config(["/usr/bin/sleep", "3"])
+    process.set_command(["/usr/bin/sleep", "3"])
     process.run_bg()
     assert process.get_status() is "Running"
 
 
 def test_run_background_status_poll(process):
-    process.set_config(["/usr/bin/sleep", "0.1"])
+    process.set_command(["/usr/bin/sleep", "0.1"])
     process.run_bg()
     assert process.get_status(poll=1) == 0
 
@@ -112,14 +112,14 @@ def test_proc_factory_was_never_started(process_factory):
 
 
 def test_grep_stdout_fg(process):
-    process.set_config(["echo", "hello", "world"])
+    process.set_command(["echo", "hello", "world"])
     process.run()
     assert process.get_stdout() == "hello world"
     assert process.get_returncode() == 0
 
 
 def test_grep_stdout_bg(process):
-    process.set_config(["/usr/bin/echo", "hello", "worldpeace"])
+    process.set_command(["/usr/bin/echo", "hello", "worldpeace"])
     process.run_bg()
     # time.sleep(0.1)
     assert process.get_status() == 0
@@ -129,8 +129,8 @@ def test_grep_stdout_bg(process):
 
 
 def test_grep_stderr_bg(process):
-    # process.set_config(["/bin/sh", "-c", "echo not found", ">&2"])
-    process.set_config(["/usr/bin/ls", "notthere"])
+    # process.set_command(["/bin/sh", "-c", "echo not found", ">&2"])
+    process.set_command(["/usr/bin/ls", "notthere"])
     process.run_bg()
     # time.sleep(0.1)
     assert process.get_status() == 2

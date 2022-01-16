@@ -48,6 +48,7 @@ So far, this will only un on unix-like systems.
     tox -e {lint, linttest}
 
 ### Measure test execution
+
     pip install .; python -m pytest -s --log-cli-level=INFO --junitxml=junit.xml
     xmllint junit.xml --format > junitf.xml
 
