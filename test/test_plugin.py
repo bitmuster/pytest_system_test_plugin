@@ -73,11 +73,25 @@ def test_use_case_echo(process):
     time.sleep(1)
     process.kill()
 
+def test_proc_factory(process_factory):
+    proc1 = process_factory(["/usr/bin/sleep", "100"])
+    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    proc1.run_bg()
+    proc2.run_bg()
+    time.sleep(0.1)
+    proc1.kill()
+    proc2.kill()
 
-def test_use_case_echo_and_curl(process):
+def test_proc_factory_autokill(process_factory):
+    proc1 = process_factory(["/usr/bin/sleep", "100"])
+    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    proc1.run_bg()
+    proc2.run_bg()
+
+def test_use_case_echo_and_curl(process_factory, process):
     # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
-    process.set_config(
+    server = process_factory(
         [
             interpreter,
             "-m",
@@ -88,11 +102,10 @@ def test_use_case_echo_and_curl(process):
             "8080",
         ]
     )
-    process.run_bg()
-
-    "curl -X POST http://localhost:8080 -d hello_my_plugins"
-
-    time.sleep(1)
-    process.kill()
+    server.run_bg()
+    # give the server 100ms to start in the background
+    time.sleep(0.1)
+    process.set_config( "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split())
+    assert process.run() == 0
 
 
