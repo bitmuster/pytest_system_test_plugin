@@ -32,13 +32,13 @@ def test_echo_hello(process):
 
 
 def test_run_background_echo_hello(process):
-    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 1"])
+    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1"])
     process.run_bg()
     assert process.get_status() == 0
 
 
 def test_run_background_echo_hello_fail(process):
-    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 1 ; false"])
+    process.set_config(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"])
     process.run_bg()
     assert process.get_status() == 1
 
@@ -50,9 +50,9 @@ def test_run_background_status_poll_fails(process):
 
 
 def test_run_background_status_poll(process):
-    process.set_config(["/usr/bin/sleep", "3"])
+    process.set_config(["/usr/bin/sleep", "0.1"])
     process.run_bg()
-    assert process.get_status(poll=4) == 0
+    assert process.get_status(poll=1) == 0
 
 
 def test_use_case_echo(process):

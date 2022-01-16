@@ -69,9 +69,9 @@ class PystProcess:
         else:
             logging.info("Im the parent, there is a new child %s", self.child)
 
-    def get_status(self, poll=2):
+    def get_status(self, poll=1):
 
-        for _ in range(poll * 10):
+        for _ in range(poll*10):
             pid, status = os.waitpid(self.child, os.WNOHANG)
             # print(pid,status)
             if (pid, status) == (0, 0):
