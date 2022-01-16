@@ -15,6 +15,7 @@ import time
 class PystProcess:
     def __init__(self, config):
         self.config = config
+        self.child = None
         logging.debug("    A new process: %s", self.config)
 
     def set_config(self, config):
@@ -87,4 +88,7 @@ class PystProcess:
 
     def kill(self):
         logging.debug("    Process: terminate: %s", self.config)
-        os.kill(self.child, signal.SIGKILL)
+        if self.child is None:
+            logging.warn("Chiild was never called, won't kill it")
+        else:
+            os.kill(self.child, signal.SIGKILL)

@@ -88,6 +88,13 @@ def test_proc_factory_autokill(process_factory):
     proc1.run_bg()
     proc2.run_bg()
 
+def test_proc_factory_one_not_called(process_factory):
+    # Test will pass and we will see a warning in pytest
+    # TODO: can we run an assertion on that?
+    proc1 = process_factory(["/usr/bin/sleep", "100"])
+    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    proc1.run_bg()
+
 def test_use_case_echo_and_curl(process_factory, process):
     # TODO: Find bette way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
@@ -108,4 +115,24 @@ def test_use_case_echo_and_curl(process_factory, process):
     process.set_config( "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split())
     assert process.run() == 0
 
+
+def test_use_case_echo_and_curl_from_factory(process_factory, process):
+    # TODO: Find bette way of getting an interpreter in the current env
+    interpreter = os.path.abspath("./env-plugin/bin/python")
+    server = process_factory(
+        [
+            interpreter,
+            "-m",
+            "restapi_echo_server",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8080",
+        ]
+    )
+    server.run_bg()
+    # give the server 100ms to start in the background
+    time.sleep(0.1)
+    client = process_factory( "/usr/bin/curl -X POST http://localhost:8080 -d hello_my_plugins".split())
+    client.run_bg()
 
