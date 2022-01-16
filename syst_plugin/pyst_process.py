@@ -1,5 +1,6 @@
 import os
 import os.path
+import time
 import subprocess
 
 debug = False
@@ -47,7 +48,7 @@ class PystProcess():
         self.outfile = os.path.abspath('./out/stdout.out')
         self.errfile = os.path.abspath('./out/stderr.out')
         #self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
-        self.cmd = ['/usr/bin/sleep', '20']
+        self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
         self.newenv = {}
         self.child = os.fork()
         if self.child == 0:
@@ -57,18 +58,26 @@ class PystProcess():
             err = os.open(self.errfile, flags)
             os.dup2(out, 1) # Duplicate stdout to the the descriptor
             os.dup2(err, 2) # Duplicate stderr the descriptor
+            os.setpgrp()
             print("Im the child, one line before execve")
             os.execve(self.cmd[0], self.cmd, self.newenv)
         else:
             print(f"Im the parent, there is a new child {self.child}")
 
     def get_status(self):
-        pid,status = os.waitpid(self.child, 0)#, os.WNOHANG)
-        print(pid,status)
-        if (pid,status) == (0,0):
-            print(f"No status available for child {self.child}")
-            if os.WIFEXITED(status):
-                print("Exitstatus", os.WEXITSTATUS(status))
+
+        for i in range(20):
+            pid,status = os.waitpid(self.child, os.WNOHANG)
+            print(pid,status)
+            if (pid,status) == (0,0):
+                print(f"No status available for child {self.child}")
+            else:
+                if os.WIFEXITED(status):
+                    exitstatus = os.WEXITSTATUS(status)
+                    print("Exitstatus", exitstatus)
+                    return exitstatus
+            time.sleep(0.2)
+
         return status
 
     def terminate(self):
