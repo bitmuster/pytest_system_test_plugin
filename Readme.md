@@ -39,6 +39,9 @@ Features should be (intended, unfinished):
 ## Test
 
     pip install .; python -m pytest -s
+    tox
+    tox -e {lint, linttest}
+
 
 
 ## Links

@@ -19,7 +19,7 @@ def test_get_set_config():
 def test_terminate():
     pystp = PystProcess(["true"])
     assert pystp.run() == 0
-    assert pystp.terminate() == None
+    assert pystp.terminate() is None
 
 
 def test_echo():
@@ -62,7 +62,7 @@ def test_stderr_file():
         os.path.join(os.path.dirname(__file__), "../syst_plugin/stderr.out")
     )
     print(content)
-    with open(content) as out:
+    with open(content, encoding="utf-8") as out:
         assert out.read().strip() == exp
 
 
@@ -73,5 +73,5 @@ def test_stdout_file():
     content = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "../syst_plugin/stdout.out")
     )
-    with open(content) as out:
+    with open(content, encoding="utf-8") as out:
         assert out.read().strip() == exp

@@ -15,7 +15,7 @@ def test_process_get_config(process):
 
 
 def test_process_terminate(process):
-    assert process.terminate() == None
+    assert process.terminate() is None
 
 
 def test_echo_hello(process):
@@ -40,7 +40,7 @@ def test_run_background_echo_hello_fail(process):
 def test_run_background_status_poll_fails(process):
     process.set_config(["/usr/bin/sleep", "3"])
     process.run_bg()
-    assert process.get_status() == None
+    assert process.get_status() is None
 
 
 def test_run_background_status_poll(process):

@@ -1,16 +1,20 @@
+""" Implementation of the process class for the pyst plugin
+"""
+
+import logging
 import os
 import os.path
 import time
 import subprocess
 
-debug = False
+
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class PystProcess:
     def __init__(self, config):
         self.config = config
-        if debug:
-            print(f"    A new process: {self.config}")
+        logging.debug("    A new process: %s", self.config)
 
     def set_config(self, config):
         self.config = config
@@ -28,8 +32,7 @@ class PystProcess:
         return self.proc.returncode
 
     def run(self):
-        if debug:
-            print(f"    Process: run: {self.config}")
+        logging.debug("    Process: run: %s", self.config)
         self.proc = subprocess.run(
             self.config, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
@@ -53,35 +56,33 @@ class PystProcess:
         self.newenv = {}
         self.child = os.fork()
         if self.child == 0:
-            print("Im the child")
+            logging.info("Im the child")
             flags = os.O_CREAT | os.O_TRUNC | os.O_WRONLY
             out = os.open(self.outfile, flags)
             err = os.open(self.errfile, flags)
             os.dup2(out, 1)  # Duplicate stdout to the the descriptor
             os.dup2(err, 2)  # Duplicate stderr the descriptor
             os.setpgrp()
-            print("Im the child, one line before execve")
+            logging.info("Im the child, one line before execve")
             os.execve(self.cmd[0], self.cmd, self.newenv)
         else:
-            print(f"Im the parent, there is a new child {self.child}")
+            logging.info("Im the parent, there is a new child %s", self.child)
 
     def get_status(self, poll=2):
 
-        for i in range(poll * 10):
+        for _ in range(poll * 10):
             pid, status = os.waitpid(self.child, os.WNOHANG)
             # print(pid,status)
             if (pid, status) == (0, 0):
-                if debug:
-                    print(f"No status available for child {self.child}")
+                logging.debug("No status available for child %s", self.child)
             else:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)
-                    print("Exit status of background process", exitstatus)
+                    logging.info("Exit status of background process %s", exitstatus)
                     return exitstatus
             time.sleep(0.1)
 
         return None
 
     def terminate(self):
-        if debug:
-            print(f"    Process: terminate: {self.config}")
+        logging.debug("    Process: terminate: %s", self.config)
