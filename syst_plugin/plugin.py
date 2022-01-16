@@ -32,6 +32,7 @@ def process_factory():
     yield _make_process
 
     logging.debug("    <<<<<<<< We kill a generated process")
-    # kill all processes
-    # for proc in prcesses:
-    #     proc.kill()
+
+    for proc in processes:
+        logging.info("Killing process %s", proc.child)
+        proc.kill()
