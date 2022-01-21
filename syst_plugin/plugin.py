@@ -2,6 +2,8 @@
 """
 
 import logging
+import secrets
+
 import pytest
 from .pyst_process import PystProcess
 
@@ -15,7 +17,9 @@ def process(request):
     """
     logging.debug("    >>>> We call a process")
     # So far, until we have nice mechanics to modify this we only run true
-    yield PystProcess("true", testname=request.node.name)
+    yield PystProcess(
+        command="true", logpath=request.fspath, testname=request.node.name
+    )
     logging.debug("    <<<< We kill a process")
 
 
@@ -25,9 +29,13 @@ def process_factory(request):
 
     processes = []
 
-    def _make_process(cmd, name="nonamegiven"):
-        logging.debug("    >>>>>>>> We generate a process")
-        proc = PystProcess(cmd, testname=request.node.name, name=name)
+    def _make_process(cmd, name=None):
+        if not name:
+            name = secrets.token_hex(2) + "_"
+        logging.debug("    >>>>>>>> We generate a process with name %s", name)
+        proc = PystProcess(
+            command=cmd, logpath=request.fspath, testname=request.node.name, name=name
+        )
         processes.append(proc)
         return proc
 

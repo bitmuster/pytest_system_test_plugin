@@ -15,7 +15,7 @@ import time
 class PystProcess:
     """Class to manage Pytest system-test processes"""
 
-    def __init__(self, command, testname="unnamed_", name="unnamed_"):
+    def __init__(self, command, logpath, testname="unnamed_test_", name="no_name_"):
         self.child = None
         self.returncode = None
         self.background = None
@@ -23,10 +23,10 @@ class PystProcess:
         self.command = command
 
         self.testname = testname
-
+        self.logpath = logpath
         self.name = name
 
-        self.testdir = os.path.join(os.path.dirname(__file__), "out", self.testname)
+        self.testdir = os.path.join(os.path.dirname(self.logpath), "out", self.testname)
 
         logging.debug("    A new process: %s", self.command)
 
@@ -114,6 +114,7 @@ class PystProcess:
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
         self.newenv = {}
+
         self.child = os.fork()
         if self.child == 0:
             logging.info("Im the child")
