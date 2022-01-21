@@ -27,6 +27,7 @@ class PystProcess:
         self.name = name
 
         self.testdir = os.path.join(os.path.dirname(self.logpath), "out", self.testname)
+        self.newenv = {}
 
         logging.debug("    A new process: %s", self.command)
         # logging.info("Path %s", self.scriptpath)
@@ -34,9 +35,15 @@ class PystProcess:
         self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
     def set_name(self, name):
+        """Set the name of the process
+        Will be used to distinguish stdout and sterr.
+        """
         self.name = name
 
     def get_name(self):
+        """Get name of process.
+        Will be used to distinguish stdout and sterr.
+        """
         return self.name
 
     def set_command(self, command):
@@ -46,9 +53,13 @@ class PystProcess:
         self.command = command
 
     def get_command(self):
+        """Get command that will be executed
+        """
         return self.command
 
     def get_stdout(self):
+        """Get standard output of process
+        """
         if self.background:
             assert os.path.exists(self.outfile)
             with open(self.outfile, encoding="utf-8") as out:
@@ -58,6 +69,8 @@ class PystProcess:
             return self.proc.stdout.decode(encoding="utf-8").strip()
 
     def get_stderr(self):
+        """Get standard error of process
+        """
         if self.background:
             assert os.path.exists(self.errfile)
             with open(self.errfile, encoding="utf-8") as err:
@@ -67,6 +80,8 @@ class PystProcess:
             return self.proc.stderr.decode(encoding="utf-8").strip()
 
     def get_returncode(self):
+        """Get returncode
+        """
         return self.returncode
 
     def run(self):
@@ -106,7 +121,8 @@ class PystProcess:
             os.makedirs(self.testdir)
         except FileExistsError:
             pass
-        # really make sure they are there if we fork and find out then,
+
+        # really make sure all folders are there. If we fork and find out,
         # we have N forked pytests running
         assert os.path.exists(os.path.dirname(self.outfile))
         assert os.path.exists(os.path.dirname(self.errfile))
@@ -115,7 +131,6 @@ class PystProcess:
 
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
-        self.newenv = {}
 
         self.child = os.fork()
         if self.child == 0:
@@ -174,6 +189,8 @@ class PystProcess:
         return status
 
     def kill(self):
+        """Kill the child process
+        """
         logging.debug("    Process: terminate: %s", self.command)
         if self.child == 0:
             logging.error("Somebody tried to kill the parent process")

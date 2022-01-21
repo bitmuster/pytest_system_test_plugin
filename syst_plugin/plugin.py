@@ -43,6 +43,8 @@ def process_factory(request):
 
     logging.debug("    <<<<<<<< We kill a generated process")
 
+    # TODO: Do we kill processes in the right order?
+    # TODO: Wo we kill them right?
     for proc in processes:
         logging.info("Killing process %s", proc.child)
         proc.kill()
