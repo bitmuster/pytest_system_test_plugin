@@ -2,4 +2,4 @@
 env-plugin
 **/*.pyc
 pytest_system_test_plugin.egg-info
-
+test/out
