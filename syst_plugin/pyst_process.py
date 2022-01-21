@@ -110,6 +110,8 @@ class PystProcess:
         # we have N forked pytests running
         assert os.path.exists(os.path.dirname(self.outfile))
         assert os.path.exists(os.path.dirname(self.errfile))
+        assert os.access(os.path.dirname(self.outfile), os.W_OK)
+        assert os.access(os.path.dirname(self.errfile), os.W_OK)
 
         # self.cmd = ["/usr/bin/ls", "/usr/bin/false", "/usr/bin/ls", "-lah", "whatever"]
         # self.cmd = ['/usr/bin/bash', '-c', '/usr/bin/sleep 1 ; false']
