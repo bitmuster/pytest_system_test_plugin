@@ -29,7 +29,7 @@ class PystProcess:
         self.testdir = os.path.join(os.path.dirname(self.logpath), "out", self.testname)
 
         logging.debug("    A new process: %s", self.command)
-
+        # logging.info("Path %s", self.scriptpath)
         self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
         self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
@@ -119,7 +119,6 @@ class PystProcess:
 
         self.child = os.fork()
         if self.child == 0:
-            logging.info("Im the child")
             flags = os.O_CREAT | os.O_TRUNC | os.O_WRONLY
             out = os.open(self.outfile, flags)
             err = os.open(self.errfile, flags)
@@ -127,7 +126,7 @@ class PystProcess:
             os.dup2(err, 2)  # Duplicate stderr the descriptor
             os.setpgrp()
 
-            # Disabled, will make grepping more complicated
+            # Disabled, will make grepping stdout more complicated
             # logging.debug("Im the child, one line before execve")
 
             try:
@@ -138,7 +137,7 @@ class PystProcess:
                 logging.error("Will die now")
                 os.abort()
         else:
-            logging.info("Im the parent, there is a new child %s", self.child)
+            logging.info("Child pid is : %s", self.child)
 
     def get_status(self, poll=1):
         """Returns the returncode of the process and polls if it hasn't yet
