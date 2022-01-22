@@ -13,7 +13,11 @@ import time
 
 
 class PystProcess:
-    """Class to manage Pytest system-test processes"""
+    """Class to manage Pytest system-test processes
+
+    TODO: Handle stdin
+    TODO: Possibiltiy to run in subshells
+    """
 
     def __init__(self, command, logpath, testname="unnamed_test_", name="no_name_"):
         self.child = None
@@ -53,13 +57,11 @@ class PystProcess:
         self.command = command
 
     def get_command(self):
-        """Get command that will be executed
-        """
+        """Get command that will be executed"""
         return self.command
 
     def get_stdout(self):
-        """Get standard output of process
-        """
+        """Get standard output of process"""
         if self.background:
             assert os.path.exists(self.outfile)
             with open(self.outfile, encoding="utf-8") as out:
@@ -69,8 +71,7 @@ class PystProcess:
             return self.proc.stdout.decode(encoding="utf-8").strip()
 
     def get_stderr(self):
-        """Get standard error of process
-        """
+        """Get standard error of process"""
         if self.background:
             assert os.path.exists(self.errfile)
             with open(self.errfile, encoding="utf-8") as err:
@@ -80,8 +81,7 @@ class PystProcess:
             return self.proc.stderr.decode(encoding="utf-8").strip()
 
     def get_returncode(self):
-        """Get returncode
-        """
+        """Get returncode"""
         return self.returncode
 
     def run(self):
@@ -189,8 +189,7 @@ class PystProcess:
         return status
 
     def kill(self):
-        """Kill the child process
-        """
+        """Kill the child process"""
         logging.debug("    Process: terminate: %s", self.command)
         if self.child == 0:
             logging.error("Somebody tried to kill the parent process")
