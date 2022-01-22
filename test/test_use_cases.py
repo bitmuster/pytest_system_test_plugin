@@ -6,8 +6,8 @@ import pytest
 CURL = "/usr/bin/curl -X POST http://localhost:{} -d hello_my_plugins"
 
 
-@pytest.fixture
-def echoserver(process_factory):
+@pytest.fixture(name="echoserver")
+def fixture_echoserver(process_factory):
     """
     Custom fixture starts an echoserver on port 8090
     """
@@ -30,8 +30,8 @@ def echoserver(process_factory):
     process.kill()
 
 
-@pytest.fixture
-def echoserver_2(process_factory):
+@pytest.fixture(name="echoserver_2")
+def fixture_echoserver_2(process_factory):
     """
     Custom fixture starts an echoserver on port 8092
     """
@@ -54,14 +54,14 @@ def echoserver_2(process_factory):
     process.kill()
 
 
-@pytest.fixture
-def asserts_echoserver():
+@pytest.fixture(name="asserts_echoserver")
+def fixture_asserts_echoserver():
     yield
     logging.info("Asserts Echoserver")
 
 
-@pytest.fixture
-def cleanup_echoserver():
+@pytest.fixture(name="cleanup_echoserver")
+def fixture_cleanup_echoserver():
     yield
     logging.info("Cleanup Echoserver")
 
