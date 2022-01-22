@@ -5,7 +5,7 @@ import logging
 import secrets
 
 import pytest
-from .pyst_process import PystProcess
+from . import PystProcess
 
 # logging.basicConfig(level=logging.DEBUG)
 
