@@ -7,7 +7,7 @@ import os.path
 import signal
 import subprocess
 import time
-
+from typing import Union
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -19,11 +19,17 @@ class PystProcess:
     TODO: Possibiltiy to run in subshells
     """
 
-    def __init__(self, command, logpath, testname="unnamed_test_", name="no_name_"):
+    def __init__(
+        self,
+        command: Union[list, str],
+        logpath: str,
+        testname: str = "unnamed_test_",
+        name: str = "no_name_",
+    ):
         self.child = None
-        self.returncode = None
+        self.returncode: Union[int, None] = None
         self.background = None
-        self.proc = None
+        self.proc: Union[subprocess.CompletedProcess, None] = None
         self.command = command
 
         self.testname = testname
@@ -31,22 +37,28 @@ class PystProcess:
         self.name = name
 
         self.testdir = os.path.join(os.path.dirname(self.logpath), "out", self.testname)
-        self.newenv = {}
+        self.newenv: dict = {}
 
         logging.debug("    A new process: %s", self.command)
         # logging.info("Path %s", self.scriptpath)
         self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
         self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
-    def set_name(self, name):
+    def set_name(self, name: str) -> None:
         """Set the name of the process
         Will be used to distinguish stdout and sterr.
+
+        Args:
+            name
         """
         self.name = name
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Get name of process.
         Will be used to distinguish stdout and sterr.
+
+        Returns:
+            name
         """
         return self.name
 
@@ -56,36 +68,62 @@ class PystProcess:
         """
         self.command = command
 
-    def get_command(self):
-        """Get command that will be executed"""
+    def get_command(self) -> Union[str, list]:
+        """Get command that will be executed
+
+        Returns:
+            command either as string or list of strings
+        """
         return self.command
 
-    def get_stdout(self):
-        """Get standard output of process"""
+    def get_stdout(self) -> str:
+        """Get standard output of process
+
+        Returns:
+            stdout
+        """
         if self.background:
             assert os.path.exists(self.outfile)
             with open(self.outfile, encoding="utf-8") as out:
                 content = out.read()
                 return content.strip()
         else:
-            return self.proc.stdout.decode(encoding="utf-8").strip()
+            if self.proc:
+                return self.proc.stdout.decode(encoding="utf-8").strip()
+            raise SystemError("Process is None")
 
-    def get_stderr(self):
-        """Get standard error of process"""
+    def get_stderr(self) -> str:
+        """Get standard error of process
+
+        Returns:
+            stderr
+        """
         if self.background:
             assert os.path.exists(self.errfile)
             with open(self.errfile, encoding="utf-8") as err:
                 content = err.read()
                 return content.strip()
         else:
-            return self.proc.stderr.decode(encoding="utf-8").strip()
+            if self.proc:
+                return self.proc.stderr.decode(encoding="utf-8").strip()
+            raise SystemError("Process is None")
 
-    def get_returncode(self):
-        """Get returncode"""
-        return self.returncode
+    def get_returncode(self) -> int:
+        """Get returncode
 
-    def run(self):
-        """Run process in the foreground"""
+        Returns:
+            returncode of last process run or None
+        """
+        if self.returncode is not None:
+            return self.returncode
+        raise SystemError("Returncode is None")
+
+    def run(self) -> int:
+        """Run process in the foreground with subprocess.run
+
+        Returns:
+            returncode of new process
+        """
         logging.debug("    Process: run: %s", self.command)
         # try:
         self.proc = subprocess.run(

@@ -3,6 +3,7 @@ from syst_plugin.pyst_process import PystProcess
 
 
 def test_init():
+    # TODO With mypy in place this should not pass
     pystp = PystProcess(22, __file__)
     assert pystp.get_command() == 22
 
@@ -39,6 +40,18 @@ def test_true():
     pystp.run()
     assert pystp.get_stdout() == ""
     assert pystp.get_returncode() == 0
+
+
+def test_true_not_started():
+    pystp = PystProcess("true", __file__)
+    with pytest.raises(SystemError):
+        pystp.get_stdout()
+    with pytest.raises(SystemError):
+        pystp.get_stderr()
+    with pytest.raises(SystemError):
+        pystp.get_stderr()
+    with pytest.raises(SystemError):
+        pystp.get_returncode()
 
 
 def test_true_with_name():

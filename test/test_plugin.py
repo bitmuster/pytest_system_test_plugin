@@ -53,6 +53,14 @@ def test_run_background_status_poll(process):
     assert process.get_status(poll=1) == 0
 
 
+# Factory tests
+
+
+def test_proc_factory_int(process_factory):
+    # TODO With mypy in place this should not pass
+    process_factory(88)
+
+
 def test_proc_factory(process_factory):
     proc1 = process_factory(["/usr/bin/sleep", "100"])
     proc2 = process_factory(["/usr/bin/sleep", "101"])
@@ -102,10 +110,14 @@ def test_proc_factory_was_never_started(process_factory):
     # since we fist fork and then exeve
     args = ["idonotexist"]
     proc1 = process_factory(args)
+
     with pytest.raises(SystemError):
         proc1.run_bg()
+
     assert proc1.get_status(5) is None
-    assert proc1.get_returncode() is None
+
+    with pytest.raises(SystemError):
+        proc1.get_returncode()
 
 
 def test_grep_stdout_fg(process):
