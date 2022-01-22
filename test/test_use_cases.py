@@ -77,13 +77,16 @@ def test_use_case_echo(echoserver):
 def test_use_case_echo_with_additional_cleanup(
     echoserver, asserts_echoserver, cleanup_echoserver
 ):
+    _ = asserts_echoserver  # for now just use them otherwise pylint will complain
+    _ = cleanup_echoserver
+
     # Does not work right
     echoserver.run_bg()
     time.sleep(0.1)
 
 
 def test_use_case_echo_and_curl(process_factory, process):
-    # TODO: Find bette way of getting an interpreter in the current env
+    # TODO: Find better way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
     server = process_factory(
         [

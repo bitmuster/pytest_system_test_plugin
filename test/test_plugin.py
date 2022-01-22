@@ -81,7 +81,7 @@ def test_proc_factory_one_not_called(process_factory):
     # Test will pass and we will see a warning in pytest
     # TODO: can we run an assertion on that?
     proc1 = process_factory(["/usr/bin/sleep", "100"])
-    proc2 = process_factory(["/usr/bin/sleep", "101"])
+    process_factory(["/usr/bin/sleep", "101"])
     proc1.run_bg()
 
 
