@@ -214,23 +214,43 @@ def test_use_case_echoserver_1_and_2(process_factory, echoserver, echoserver_2):
     assert "hello_my_plugins" in echoserver_2.get_stderr()
 
 def test_use_case_echo_and_curl_from_factory_N(process_factory):
-    # TODO: Find better way of getting an interpreter in the current env
-    interpreter = os.path.abspath("./env-plugin/bin/python")
-    server = process_factory( get_factory_args(8080), "server_"  )
-    server.run_bg()
-    assert server.get_status() == "Running"  # make sure it still runs
-    # give the server 100ms to start in the background
+
+    amount = 10
+    servers=[]
+    clients=[]
+
+    for i in range(amount):
+        server = process_factory( get_factory_args(8080+i), f"server_{i}_"  )
+        server.run_bg()
+        time.sleep(0.5)
+        status = server.get_status()
+        if status != "Running":
+            logging.error("Something went wrong here is stdout")
+            logging.error(server.get_stdout())
+            logging.error("Something went wrong here is stderr")
+            logging.error(server.get_stderr())
+            assert status == "Running"
+
+        servers.append(server)
+
     time.sleep(0.1)
-    client = process_factory(
-        CURL.format(8080).split(),
-        "client_",
-    )
-    client.run_bg()
-    assert client.get_status() == 0
-    server.kill()
-    assert server.get_status() == "NotExisting"
 
-    # For weird reasons the echoserver logs to stderr
-    assert server.get_stdout() == ""
-    assert "hello_my_plugins" in server.get_stderr()
+    for i in range(amount):
+        client = process_factory(
+            CURL.format(8080+i).split(),
+            f"client_{i}_",
+        )
+        client.run_bg()
 
+    for client in clients:
+        assert client.get_status() == 0
+        clients.append(dlient)
+
+    for server in servers:
+        server.kill()
+        assert server.get_status() == "NotExisting"
+
+    for server in servers:
+        # For weird reasons the echoserver logs to stderr
+        assert server.get_stdout() == ""
+        assert "hello_my_plugins" in server.get_stderr()
