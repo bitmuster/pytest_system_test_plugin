@@ -92,3 +92,18 @@ def test_stdout_file():
     pystp = PystProcess(["echo", "hello", "nice", "ball"], __file__)
     pystp.run()
     assert pystp.get_stdout() == exp
+
+
+def test_run(mocker):
+    runmock = mocker.MagicMock()
+    runmock.stdout = b"whatever"
+    runmock.stderr = b"nope"
+    mock = mocker.patch("subprocess.run", return_value=runmock)
+    mocker.patch("__main__.open", mocker.mock_open(read_data="stuff"))
+    pystp = PystProcess("false", __file__)
+
+    pystp.run()
+
+    mock.assert_called_once_with(
+        "false", stdout=mocker.ANY, stderr=mocker.ANY, check=False
+    )

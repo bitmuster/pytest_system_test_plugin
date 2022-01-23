@@ -33,6 +33,7 @@ So far, this will only un on unix-like systems.
     python3 -m venv env-plugin
     source env-plugin/bin/activate
     pip install pytest
+    pip install pytest-mock
 
     # To run tests
     pip install restapi_echo_server
