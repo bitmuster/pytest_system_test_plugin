@@ -37,6 +37,9 @@ def test_proc_factory_function_2(process_factory):
 
 
 def dis_test_proc_factory_session(process_factory_session):
+    """TODO Disabled: stdout of pytest appears in the logged stdout ???
+    Do we have a os.fork going wild?
+    """
     logging.info("here we run a session fixture")
     p = process_factory_session("/usr/bin/true")
     p.run_bg()
