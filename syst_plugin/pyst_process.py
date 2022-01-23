@@ -206,7 +206,7 @@ class PystProcess:
             try:
                 pid, status = os.waitpid(self.child, os.WNOHANG)
             except ChildProcessError:
-                logging.warning("Process %i is not existing", self.child)
+                logging.debug("Process %i is not existing", self.child)
                 self.child = None
                 return "NotExisting"
             # print(pid,status)
@@ -220,7 +220,7 @@ class PystProcess:
             else:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)
-                    logging.info("Exit status of background process %s", exitstatus)
+                    logging.debug("Exit status of background process %s", exitstatus)
                     self.returncode = exitstatus
                     return exitstatus
             time.sleep(0.1)
@@ -233,13 +233,13 @@ class PystProcess:
         if self.child == 0:
             logging.error("Somebody tried to kill the parent process")
         elif self.child is None:
-            logging.warning("Child was never called, won't kill it")
+            logging.debug("Child was never called, won't kill it")
         elif self.returncode is not None:
-            logging.warning(
+            logging.debug(
                 "Child %s has already quit with %s, won't kill it",
                 self.child,
                 self.returncode,
             )
         else:
-            print("Ret", self.returncode)
+            logging.debug("Will kill %s with exit code %s", self.child, self.returncode)
             os.kill(self.child, signal.SIGKILL)
