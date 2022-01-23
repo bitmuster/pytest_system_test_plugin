@@ -10,7 +10,8 @@ from . import PystProcess
 # logging.basicConfig(level=logging.DEBUG)
 
 
-@pytest.fixture
+
+@pytest.fixture(scope='function')
 def process(request):
     """process base fixture
     Issue: When used multiple time in one test it will return cached results !!!
@@ -23,7 +24,7 @@ def process(request):
     logging.debug("    <<<< We kill a process")
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def process_factory(request):
     """process base fixture factory"""
 
