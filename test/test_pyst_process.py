@@ -107,3 +107,27 @@ def test_run(mocker):
     mock.assert_called_once_with(
         "false", stdout=mocker.ANY, stderr=mocker.ANY, check=False
     )
+
+
+def test_run_bg_parent(mocker):
+    fmock = mocker.patch("os.fork", return_value=44)
+    emock = mocker.patch("os.execve")
+    pystp = PystProcess("/usr/bin/false", __file__)
+    pystp.run_bg()
+    fmock.assert_called_once_with()
+    emock.assert_not_called()
+
+
+def test_run_bg_child(mocker):
+    fmock = mocker.patch("os.fork", return_value=0)
+    emock = mocker.patch("os.execve")
+    mocker.patch("os.dup2")
+    mocker.patch("os.open")
+    mocker.patch("os.setpgrp")
+
+    pystp = PystProcess("/usr/bin/false", __file__)
+
+    pystp.run_bg()
+
+    fmock.assert_called_once_with()
+    emock.assert_called_once_with("/", "/usr/bin/false", {})
