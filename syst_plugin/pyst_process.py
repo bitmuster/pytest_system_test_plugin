@@ -21,7 +21,7 @@ class PystProcess:
 
     def __init__(
         self,
-        command: Union[List[Any], str],
+        command: Union[List[str], str],
         logpath: str,
         testname: str = "unnamed_test_",
         name: str = "no_name_",
@@ -30,7 +30,7 @@ class PystProcess:
         self.returncode: Union[int, None] = None
         self.background: Union[bool, None] = None
         self.proc: Union[subprocess.CompletedProcess, None] = None
-        self.command: Union[list, str] = command
+        self.command: Union[List[str], str] = command
 
         self.testname = testname
         self.logpath = logpath
@@ -154,11 +154,13 @@ class PystProcess:
 
         self.background = True
 
-        if (not isinstance(self.command, list)) and (not isinstance(self.command,
-            str)):
+        if (not isinstance(self.command, list)) and (not isinstance(self.command, str)):
             raise SystemError("Please supply a list of strings as command")
 
         if not isinstance(self.command[0], str):
+            raise SystemError("Please supply a list of strings as command")
+
+        if not all([c for c in self.command if type(c) == str]):
             raise SystemError("Please supply a list of strings as command")
 
         if not os.path.exists(self.command[0]):
@@ -191,7 +193,7 @@ class PystProcess:
             # logging.debug("Im the child, one line before execve")
 
             try:
-                os.execve(self.command[0], self.command, self.newenv)
+                os.execve(self.command[0], self.command, self.newenv)  # type: ignore
             except OSError as exception:
                 logging.error("Caught excepton on execve: %s", exception)
                 # raise exception
@@ -236,7 +238,7 @@ class PystProcess:
 
         return status
 
-    def kill(self):
+    def kill(self) -> None:
         """Kill the child process"""
         logging.debug("    Process: terminate: %s", self.command)
         if self.child == 0:
