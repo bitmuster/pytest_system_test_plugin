@@ -12,7 +12,7 @@ from . import PystProcess
 # TODO: Automatically delete output folders
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def process(request):
     """process base fixture
     Issue: When used multiple time in one test it will return cached results !!!
@@ -25,7 +25,7 @@ def process(request):
     logging.debug("    <<<< We kill a process")
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def process_factory(request):
     """process base fixture factory"""
 
@@ -64,7 +64,9 @@ def process_factory_module(request):
     def _make_process(cmd, name=None):
         if not name:
             name = secrets.token_hex(2) + "_"
-        logging.info("    >>>>>>>> We generate a module scope process with name %s", name)
+        logging.info(
+            "    >>>>>>>> We generate a module scope process with name %s", name
+        )
         proc = PystProcess(
             command=cmd, logpath=request.fspath, testname=request.node.name, name=name
         )
@@ -80,6 +82,7 @@ def process_factory_module(request):
         logging.info("Killing process %s", proc.child)
         proc.kill()
 
+
 @pytest.fixture(scope="session")
 def process_factory_session(request):
     """process base fixture factory
@@ -91,7 +94,9 @@ def process_factory_session(request):
     def _make_process(cmd, name=None):
         if not name:
             name = secrets.token_hex(2) + "_"
-        logging.info("    >>>>>>>> We generate a session scope process with name %s", name)
+        logging.info(
+            "    >>>>>>>> We generate a session scope process with name %s", name
+        )
         proc = PystProcess(
             command=cmd, logpath="session_", testname=request.node.name, name=name
         )
@@ -106,4 +111,3 @@ def process_factory_session(request):
         logging.info("    <<<<<<<< We kill a session scope generated process")
         logging.info("Killing process %s", proc.child)
         proc.kill()
-
