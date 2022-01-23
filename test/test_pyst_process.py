@@ -131,3 +131,27 @@ def test_run_bg_child(mocker):
 
     fmock.assert_called_once_with()
     emock.assert_called_once_with("/", "/usr/bin/false", {})
+
+
+def test_run_bg_child_wrong_args(mocker):
+    fmock = mocker.patch("os.fork")
+    emock = mocker.patch("os.execve")
+    pystp = PystProcess(42, __file__)
+
+    with pytest.raises(SystemError):
+        pystp.run_bg()
+
+    fmock.assert_not_called()
+    emock.assert_not_called()
+
+
+def test_run_bg_child_wrong_args_b(mocker):
+    fmock = mocker.patch("os.fork")
+    emock = mocker.patch("os.execve")
+    pystp = PystProcess([42, 42], __file__)
+
+    with pytest.raises(SystemError):
+        pystp.run_bg()
+
+    fmock.assert_not_called()
+    emock.assert_not_called()

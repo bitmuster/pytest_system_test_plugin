@@ -7,7 +7,7 @@ import os.path
 import signal
 import subprocess
 import time
-from typing import Union
+from typing import Union, List, Any
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -21,16 +21,16 @@ class PystProcess:
 
     def __init__(
         self,
-        command: Union[list, str],
+        command: Union[List[Any], str],
         logpath: str,
         testname: str = "unnamed_test_",
         name: str = "no_name_",
     ):
-        self.child = None
+        self.child: Union[int, None] = None
         self.returncode: Union[int, None] = None
-        self.background = None
+        self.background: Union[bool, None] = None
         self.proc: Union[subprocess.CompletedProcess, None] = None
-        self.command = command
+        self.command: Union[list, str] = command
 
         self.testname = testname
         self.logpath = logpath
@@ -146,13 +146,21 @@ class PystProcess:
         self.returncode = self.proc.returncode
         return self.proc.returncode
 
-    def run_bg(self):
+    def run_bg(self) -> None:
         """Run process in the background
         TODO: Maybe merge with run()
         Note: Unlike run we need the full path of the binary here
         """
 
         self.background = True
+
+        if (not isinstance(self.command, list)) and (not isinstance(self.command,
+            str)):
+            raise SystemError("Please supply a list of strings as command")
+
+        if not isinstance(self.command[0], str):
+            raise SystemError("Please supply a list of strings as command")
+
         if not os.path.exists(self.command[0]):
             raise SystemError("Programm is not exiting: ", self.command[0])
         try:
@@ -192,7 +200,7 @@ class PystProcess:
         else:
             logging.info("Child pid is : %s", self.child)
 
-    def get_status(self, poll=1):
+    def get_status(self, poll: int = 1) -> Union[int, None, str]:
         """Returns the returncode of the process and polls if it hasn't yet
         finished.
         Returns "Running" if the process is still running.
@@ -201,7 +209,7 @@ class PystProcess:
         if self.child is None:
             return None
 
-        status = None
+        status: Union[int, None, str] = None
         for _ in range(poll * 10):
             try:
                 pid, status = os.waitpid(self.child, os.WNOHANG)
