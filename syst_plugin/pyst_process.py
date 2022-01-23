@@ -7,7 +7,7 @@ import os.path
 import signal
 import subprocess
 import time
-from typing import Union, List, Any
+from typing import Union, List
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -160,7 +160,7 @@ class PystProcess:
         if not isinstance(self.command[0], str):
             raise SystemError("Please supply a list of strings as command")
 
-        if not all([c for c in self.command if type(c) == str]):
+        if not all(map(lambda x: isinstance(x, str), self.command)):
             raise SystemError("Please supply a list of strings as command")
 
         if not os.path.exists(self.command[0]):
