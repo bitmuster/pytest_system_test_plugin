@@ -216,6 +216,7 @@ class PystProcess:
                     self.child,
                 )
                 status = "Running"
+                return status
             else:
                 if os.WIFEXITED(status):
                     exitstatus = os.WEXITSTATUS(status)

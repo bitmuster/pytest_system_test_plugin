@@ -1,6 +1,7 @@
 import time
 import pytest
 
+WAITSTATUS = 0.1
 
 def test_process_run(process):
     assert process.run() == 0
@@ -25,6 +26,7 @@ def test_process_kill(process):
 def test_echo_hello(process):
     process.set_command(["echo", "hello", "world"])
     process.run()
+    time.sleep(WAITSTATUS)
     assert process.get_stdout() == "hello world"
     assert process.get_returncode() == 0
 
@@ -32,12 +34,14 @@ def test_echo_hello(process):
 def test_run_background_echo_hello(process):
     process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1"])
     process.run_bg()
+    time.sleep(WAITSTATUS*2)
     assert process.get_status() == 0
 
 
 def test_run_background_echo_hello_fail(process):
     process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"])
     process.run_bg()
+    time.sleep(WAITSTATUS*2)
     assert process.get_status() == 1
 
 
@@ -50,6 +54,7 @@ def test_run_background_status_poll_fails(process):
 def test_run_background_status_poll(process):
     process.set_command(["/usr/bin/sleep", "0.1"])
     process.run_bg()
+    time.sleep(WAITSTATUS*2)
     assert process.get_status(poll=1) == 0
 
 
@@ -98,6 +103,7 @@ def test_proc_factory_has_exited_with_error(process_factory):
     args = ["/usr/bin/false"]
     proc1 = process_factory(args)
     proc1.run_bg()
+    time.sleep(WAITSTATUS)
     assert proc1.get_status(5) == 1
     assert proc1.get_returncode() == 1
     time.sleep(1)
@@ -131,6 +137,7 @@ def test_grep_stdout_bg(process):
     process.set_command(["/usr/bin/echo", "hello", "worldpeace"])
     process.run_bg()
     # time.sleep(0.1)
+    time.sleep(WAITSTATUS)
     assert process.get_status() == 0
     assert process.background is True
     assert process.get_stdout() == "hello worldpeace"
@@ -142,6 +149,7 @@ def test_grep_stderr_bg(process):
     process.set_command(["/usr/bin/ls", "notthere"])
     process.run_bg()
     # time.sleep(0.1)
+    time.sleep(WAITSTATUS)
     assert process.get_status() == 2
     assert process.background is True
     assert (
