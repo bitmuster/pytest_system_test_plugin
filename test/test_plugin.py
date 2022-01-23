@@ -3,6 +3,7 @@ import pytest
 
 WAITSTATUS = 0.1
 
+
 def test_process_run(process):
     assert process.run() == 0
 
@@ -34,14 +35,14 @@ def test_echo_hello(process):
 def test_run_background_echo_hello(process):
     process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1"])
     process.run_bg()
-    time.sleep(WAITSTATUS*2)
+    time.sleep(WAITSTATUS * 2)
     assert process.get_status() == 0
 
 
 def test_run_background_echo_hello_fail(process):
     process.set_command(["/usr/bin/sh", "-c", "/usr/bin/sleep 0.1 ; false"])
     process.run_bg()
-    time.sleep(WAITSTATUS*2)
+    time.sleep(WAITSTATUS * 2)
     assert process.get_status() == 1
 
 
@@ -54,7 +55,7 @@ def test_run_background_status_poll_fails(process):
 def test_run_background_status_poll(process):
     process.set_command(["/usr/bin/sleep", "0.1"])
     process.run_bg()
-    time.sleep(WAITSTATUS*2)
+    time.sleep(WAITSTATUS * 2)
     assert process.get_status(poll=1) == 0
 
 

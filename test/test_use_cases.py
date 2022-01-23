@@ -6,21 +6,23 @@ import pytest
 CURL = "/usr/bin/curl -X POST http://localhost:{} -d hello_my_plugins"
 WAITSTATUS = 0.1
 
+
 def get_factory_args(port):
 
     # TODO: Find better way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
 
-    args= [
-            interpreter,
-            "-m",
-            "restapi_echo_server",
-            "--host",
-            "0.0.0.0",
-            "--port",
-            str(port),
-        ]
+    args = [
+        interpreter,
+        "-m",
+        "restapi_echo_server",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        str(port),
+    ]
     return args
+
 
 @pytest.fixture(name="echoserver")
 def fixture_echoserver(process_factory):
@@ -219,14 +221,15 @@ def test_use_case_echoserver_1_and_2(process_factory, echoserver, echoserver_2):
     assert "hello_my_plugins" in echoserver_1.get_stderr()
     assert "hello_my_plugins" in echoserver_2.get_stderr()
 
-def test_use_case_echo_and_curl_from_factory_N(process_factory):
+
+def test_use_case_echo_and_curl_from_factory_n(process_factory):
 
     amount = 10
-    servers=[]
-    clients=[]
+    servers = []
+    clients = []
 
     for i in range(amount):
-        server = process_factory( get_factory_args(8080+i), f"server_{i}_"  )
+        server = process_factory(get_factory_args(8080 + i), f"server_{i}_")
         server.run_bg()
         servers.append(server)
 
@@ -247,7 +250,7 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
 
     for i in range(amount):
         client = process_factory(
-            CURL.format(8080+i).split(),
+            CURL.format(8080 + i).split(),
             f"client_{i}_",
         )
         client.run_bg()
@@ -257,7 +260,7 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
 
     for client in clients:
         assert client.get_status() == 0
-        clients.append(dlient)
+        clients.append(client)
 
     for server in servers:
         server.kill()
@@ -275,4 +278,3 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
     for client in clients:
         assert "method" in client.get_stdout()
         assert "Total" in client.get_stderr()
-

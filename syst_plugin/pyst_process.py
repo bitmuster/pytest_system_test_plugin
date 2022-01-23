@@ -217,12 +217,13 @@ class PystProcess:
                 )
                 status = "Running"
                 return status
-            else:
-                if os.WIFEXITED(status):
-                    exitstatus = os.WEXITSTATUS(status)
-                    logging.debug("Exit status of background process %s", exitstatus)
-                    self.returncode = exitstatus
-                    return exitstatus
+
+            if os.WIFEXITED(status):
+                exitstatus = os.WEXITSTATUS(status)
+                logging.debug("Exit status of background process %s", exitstatus)
+                self.returncode = exitstatus
+                return exitstatus
+
             time.sleep(0.1)
 
         return status
