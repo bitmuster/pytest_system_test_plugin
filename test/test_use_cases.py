@@ -222,7 +222,12 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
     for i in range(amount):
         server = process_factory( get_factory_args(8080+i), f"server_{i}_"  )
         server.run_bg()
-        time.sleep(0.5)
+        servers.append(server)
+
+    time.sleep(0.1)
+
+    logging.info("Polling server status")
+    for server in servers:
         status = server.get_status()
         if status != "Running":
             logging.error("Something went wrong here is stdout")
@@ -231,9 +236,8 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
             logging.error(server.get_stderr())
             assert status == "Running"
 
-        servers.append(server)
-
     time.sleep(0.1)
+    logging.info("Starting clients")
 
     for i in range(amount):
         client = process_factory(
@@ -242,15 +246,27 @@ def test_use_case_echo_and_curl_from_factory_N(process_factory):
         )
         client.run_bg()
 
+    time.sleep(0.1)
+    logging.info("Polling clients")
+
     for client in clients:
         assert client.get_status() == 0
         clients.append(dlient)
 
     for server in servers:
         server.kill()
+
+    time.sleep(0.1)
+
+    for server in servers:
         assert server.get_status() == "NotExisting"
 
     for server in servers:
         # For weird reasons the echoserver logs to stderr
         assert server.get_stdout() == ""
         assert "hello_my_plugins" in server.get_stderr()
+
+    for client in clients:
+        assert "method" in client.get_stdout()
+        assert "Total" in client.get_stderr()
+
