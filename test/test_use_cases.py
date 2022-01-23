@@ -6,6 +6,22 @@ import pytest
 CURL = "/usr/bin/curl -X POST http://localhost:{} -d hello_my_plugins"
 
 
+def get_factory_args(port):
+
+    # TODO: Find better way of getting an interpreter in the current env
+    interpreter = os.path.abspath("./env-plugin/bin/python")
+
+    args= [
+            interpreter,
+            "-m",
+            "restapi_echo_server",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            str(port),
+        ]
+    return args
+
 @pytest.fixture(name="echoserver")
 def fixture_echoserver(process_factory):
     """
@@ -109,7 +125,7 @@ def test_use_case_echo_and_curl(process_factory, process):
 
 
 def test_use_case_echo_and_curl_from_factory(process_factory):
-    # TODO: Find bette way of getting an interpreter in the current env
+    # TODO: Find better way of getting an interpreter in the current env
     interpreter = os.path.abspath("./env-plugin/bin/python")
     server = process_factory(
         [
@@ -196,3 +212,25 @@ def test_use_case_echoserver_1_and_2(process_factory, echoserver, echoserver_2):
 
     assert "hello_my_plugins" in echoserver_1.get_stderr()
     assert "hello_my_plugins" in echoserver_2.get_stderr()
+
+def test_use_case_echo_and_curl_from_factory_N(process_factory):
+    # TODO: Find better way of getting an interpreter in the current env
+    interpreter = os.path.abspath("./env-plugin/bin/python")
+    server = process_factory( get_factory_args(8080), "server_"  )
+    server.run_bg()
+    assert server.get_status() == "Running"  # make sure it still runs
+    # give the server 100ms to start in the background
+    time.sleep(0.1)
+    client = process_factory(
+        CURL.format(8080).split(),
+        "client_",
+    )
+    client.run_bg()
+    assert client.get_status() == 0
+    server.kill()
+    assert server.get_status() == "NotExisting"
+
+    # For weird reasons the echoserver logs to stderr
+    assert server.get_stdout() == ""
+    assert "hello_my_plugins" in server.get_stderr()
+
