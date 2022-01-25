@@ -165,6 +165,7 @@ def test_use_case_echo_and_curl_from_factory(process_factory):
 
 def test_use_case_echoserver_fixture_and_curl(process_factory, echoserver):
     echoserver.run_bg()
+    time.sleep(WAITSTATUS) # give the server some time to start
     assert echoserver.get_status() == "Running"  # make sure it still runs
     # give the server 100ms to start in the background
     time.sleep(0.1)
@@ -245,7 +246,7 @@ def test_use_case_echo_and_curl_from_factory_n(process_factory):
             logging.error(server.get_stderr())
             assert status == "Running"
 
-    time.sleep(0.1)
+    time.sleep(0.5)
     logging.info("Starting clients")
 
     for i in range(amount):
@@ -255,9 +256,10 @@ def test_use_case_echo_and_curl_from_factory_n(process_factory):
         )
         client.run_bg()
 
-    time.sleep(0.1)
+    time.sleep(0.5)
     logging.info("Polling clients")
 
+    # We expect, that all clients exited with zero
     for client in clients:
         assert client.get_status() == 0
         clients.append(client)
