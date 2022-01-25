@@ -42,7 +42,7 @@ def fixture_echoserver(process_factory):
             "8090",
         ],
     )
-    process.set_name("ecoserver")
+    process.set_name("echoserver_")
     yield process
     logging.info("Killing echoserver")
     process.kill()
@@ -66,7 +66,7 @@ def fixture_echoserver_2(process_factory):
             "8092",
         ],
     )
-    process.set_name("ecoserver_2")
+    process.set_name("ecoserver_2_")
     yield process
     logging.info("Killing echoserver")
     process.kill()

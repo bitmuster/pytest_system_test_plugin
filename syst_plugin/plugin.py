@@ -48,7 +48,7 @@ def process_factory(request):
     # TODO: Do we kill processes in the right order?
     # TODO: Wo we kill them right?
     for proc in processes:
-        logging.info("Killing process %s", proc.child)
+        logging.info("Killing process %s with pid %s", proc.name, proc.child)
         proc.kill()
 
 
