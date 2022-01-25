@@ -34,10 +34,9 @@ So far, this will only un on unix-like systems.
     source env-plugin/bin/activate
     pip install pytest
     pip install pytest-mock
-
-    # To run tests
     pip install restapi_echo_server
-
+    or
+    pip install -r requirements.txt
 
 ## Usage
 
