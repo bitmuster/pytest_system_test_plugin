@@ -219,7 +219,6 @@ class PystProcess:
                 pid, status = os.waitpid(self.child, os.WNOHANG)
             except ChildProcessError:
                 logging.debug("Process %i is not existing", self.child)
-                self.child = None
                 return "NotExisting"
             # print(pid,status)
             if (pid, status) == (0, 0):
@@ -255,4 +254,7 @@ class PystProcess:
             )
         else:
             logging.debug("Will kill %s with exit code %s", self.child, self.returncode)
-            os.kill(self.child, signal.SIGKILL)
+            try:
+                os.kill(self.child, signal.SIGKILL)
+            except ProcessLookupError:
+                logging.info("Process %s with pid %i already dead", self.name, self.child)
