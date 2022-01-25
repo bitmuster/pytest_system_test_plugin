@@ -165,7 +165,7 @@ def test_use_case_echo_and_curl_from_factory(process_factory):
 
 def test_use_case_echoserver_fixture_and_curl(process_factory, echoserver):
     echoserver.run_bg()
-    time.sleep(WAITSTATUS) # give the server some time to start
+    time.sleep(WAITSTATUS)  # give the server some time to start
     assert echoserver.get_status() == "Running"  # make sure it still runs
     # give the server 100ms to start in the background
     time.sleep(0.1)

@@ -257,4 +257,6 @@ class PystProcess:
             try:
                 os.kill(self.child, signal.SIGKILL)
             except ProcessLookupError:
-                logging.info("Process %s with pid %i already dead", self.name, self.child)
+                logging.info(
+                    "Process %s with pid %i already dead", self.name, self.child
+                )
