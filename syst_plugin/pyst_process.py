@@ -52,6 +52,8 @@ class PystProcess:
             name
         """
         self.name = name
+        self.outfile = os.path.join(self.testdir, self.name + "stdout.out")
+        self.errfile = os.path.join(self.testdir, self.name + "stderr.out")
 
     def get_name(self) -> str:
         """Get name of process.
